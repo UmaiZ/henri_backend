@@ -1,6 +1,16 @@
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const { Users } = require("../model/user");
+const multer = require("multer");
+const { uploadFileWithFolder } = require("../utils/awsFileUploads");
+
+const uploadOptions = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+    },
+});
+
 
 const registerUser = async (req, res) => {
     const usercheck = await Users.find({
@@ -97,6 +107,7 @@ const loginUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+    console.log('hit')
     if (req.body.userNameChanged) {
         const usercheck = await Users.find({
             userName: req.body.userName,
@@ -106,10 +117,38 @@ const updateUser = async (req, res) => {
                 .status(200)
                 .json({ message: "user name already exist", success: false });
         }
-
     }
 
     try {
+        var userImage = req.body.userImage;
+        if (req.files.userimage) {
+            console.log('saving image');
+            const file = req.files.userimage[0];
+            const fileName = file.originalname;
+            const fileContent = file.buffer;
+
+            const fileLocation = await uploadFileWithFolder(
+                fileName,
+                "newsFeed",
+                fileContent
+            );
+            userImage = fileLocation;
+        }
+
+        var userCover = req.body.userCover;
+        if (req.files.usercover) {
+            console.log('saving image');
+            const file = req.files.usercover[0];
+            const fileName = file.originalname;
+            const fileContent = file.buffer;
+
+            const fileLocation = await uploadFileWithFolder(
+                fileName,
+                "newsFeed",
+                fileContent
+            );
+            userCover = fileLocation;
+        }
         const updateUser = await Users.findByIdAndUpdate(
             req.user.user_id,
             {
@@ -124,6 +163,8 @@ const updateUser = async (req, res) => {
                 userCoaches: req.body.userCoaches,
                 userBio: req.body.userBio,
                 userSports: req.body.userSports,
+                userImage: userImage,
+                userCover: userCover
             },
             {
                 new: true,
@@ -135,6 +176,7 @@ const updateUser = async (req, res) => {
             message: "User saved successfully",
         });
     } catch (err) {
+        console.log(err)
         if (err.name === "ValidationError") {
             console.error(Object.values(err.errors).map((val) => val.message));
             return res.status(400).json({
@@ -149,5 +191,10 @@ const updateUser = async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    updateUser
+    updateUser: [uploadOptions.fields([{
+        name: 'userimage', maxCount: 1
+    }, {
+        name: 'usercover', maxCount: 1
+    }]), updateUser],
+
 };
