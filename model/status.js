@@ -17,7 +17,15 @@ const statusschema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+
 });
+
+
+
 statusschema.virtual("statusID").get(function () {
     return this._id.toHexString();
 });

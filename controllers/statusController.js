@@ -2,6 +2,8 @@
 const { Status } = require("../model/status");
 const multer = require("multer");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
+const { Users } = require("../model/user");
+const moment = require('moment');
 
 
 const uploadOptions = multer({
@@ -75,14 +77,15 @@ const createStatus = async (req, res) => {
 const getStatus = async (req, res) => {
     try {
 
-        const status = await Status.find().populate(['createdBy']);
-        console.log(status)
-
-        res.status(200).json({
-            success: true,
-            message: "Successfully",
-            data: status,
-        });
+        const statuses = await Status.find({ createdAt: { $gte: moment().subtract(1, 'day').toDate() } }).populate('createdBy');
+        const formattedStatuses = statuses.map(status => ({
+            statusText: status.statusText,
+            statusImage: status.statusImage,
+            statusVideo: status.statusVideo,
+            createdBy: status.createdBy,
+            createdAt: moment(status.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }));
+        res.send(formattedStatuses);
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -95,11 +98,14 @@ const getStatus = async (req, res) => {
 
 
 
+
+
 module.exports = {
     createStatus: [uploadOptions.fields([{
         name: 'image', maxCount: 1
     }, {
         name: 'video', maxCount: 1
     }]), createStatus],
-    getStatus
+    getStatus,
+
 };
