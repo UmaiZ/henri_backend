@@ -68,6 +68,18 @@ const userschema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    userFollowers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "users",
+        },
+    ],
+    userFollowing: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "users",
+        },
+    ],
 
 });
 userschema.virtual("userID").get(function () {

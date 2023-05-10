@@ -17,16 +17,43 @@ require("dotenv/config");
 const newsFeedRouter = require("./routes/newsFeedRouter");
 const userRouter = require("./routes/user");
 const statusRouter = require("./routes/statusRouter");
+const chatRoomRouter = require("./routes/chatRouter");
 
 const responseHandler = require("./utils/ResponseHandler/responseHandler");
 
+app.use(chatRoomRouter);
 app.use(newsFeedRouter);
 app.use(userRouter);
 app.use(statusRouter);
+
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Server Running" });
 });
 app.use(responseHandler);
+
+io.on("connection", (socket) => {
+  // Join Chatroom
+  console.log("connected");
+  socket.on("joinRoom", (data) => {
+    // socket.join(chatroom);
+    socket.join(data.user);
+    messageController.getChatRoomData(io, data);
+  });
+  // Leave Chatroom
+  socket.on("leaveRoom", ({ chatroom, user }) => {
+    // socket.leave(chatroom);
+    socket.leave(user);
+  });
+  // Send Message
+  socket.on("sendMessage", (data) => {
+    messageController.sendMessages(io, data);
+  });
+  // Get Chatroom Data
+  // socket.on("getRoomDetails", (data) => {
+  //   messageController.getChatRoomData(io, data);
+  // });
+});
+
 
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.COLLECTION, {

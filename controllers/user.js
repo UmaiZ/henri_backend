@@ -188,9 +188,178 @@ const updateUser = async (req, res) => {
     }
 };
 
+
+const getUserByUserID = async (req, res) => {
+    const user = await Users.findById(req.params.id);
+    if (!user) {
+        return res.status(200).json({ message: "user not found", success: false });
+    }
+
+    return res
+        .status(200)
+        .json({ message: "success", success: true, data: user });
+};
+
+const followOrUnfollow = async (req, res) => {
+    try {
+        const { user_id } = req.user;
+        const { follow_id } = req.body;
+        if (follow_id == null || follow_id == undefined || follow_id == "") {
+            return res
+                .status(200)
+                .json({ message: "FollowerId Required", success: false });
+        }
+        if (follow_id == user_id) {
+            return res
+                .status(200)
+                .json({ message: "You can't follow yourself", success: false });
+        }
+        const user = await Users.findOne({ _id: user_id }).lean();
+        const follower = await Users.findOne({ _id: follow_id }).lean();
+        // if (!user) {
+        //   return res
+        //     .status(200)
+        //     .json({ message: "user not found", success: false });
+        // }
+        // // check Follower
+        // const checkFollower = await Users.findOne({ _id: follow_id }).lean();
+        // if (!checkFollower) {
+        //   return res
+        //     .status(200)
+        //     .json({ message: "user not found", success: false });
+        // }
+        // Check already follow or not
+        const checkFollow = await Users.findOne({
+            _id: user_id,
+            userFollowers: { $in: [follow_id] },
+        }).lean();
+        if (checkFollow) {
+            // Unfollow
+            const unfollow = await Users.findOneAndUpdate(
+                { _id: user_id },
+                {
+                    $pull: { userFollowers: follow_id },
+                }
+            );
+            await Users.findOneAndUpdate(
+                { _id: follow_id },
+                {
+                    $pull: { userFollowing: user_id },
+                },
+                { new: true }
+            );
+            // sendNotification(
+            //   follower.userNotificationToken,
+            //   "Unfollow",
+            //   `${user.userName} unfollow you`
+            // );
+            // const followFolNotification = {
+            //   userID: follower._id.toString(),
+            //   title: "Unfollow",
+            //   message: `${user.userName} unfollow you`,
+            // };
+            // await axios
+            //   .post(
+            //     `${process.env.mainserverurl}/notification/createUsersNotification`,
+            //     followFolNotification
+            //   )
+            //   .catch((err) => {
+            //     console.log(err);
+            //   });
+            // sendNotification(
+            //   user.userNotificationToken,
+            //   "Unfollow",
+            //   `You unfollow ${follower.userName}`
+            // );
+            // const unfollowUserNotification = {
+            //   userID: user._id.toString(),
+            //   title: "Unfollow",
+            //   message: `You unfollow ${follower.userName}`,
+            // };
+            // await axios.post(
+            //   `${process.env.mainserverurl}/notification/createUsersNotification`,
+            //   unfollowUserNotification
+            // );
+            if (!unfollow) {
+                return res.status(200).json({
+                    message: "unfollow not done",
+                    success: false,
+                });
+            }
+            return res.status(200).json({
+                message: "unfollow done",
+                success: true,
+                follow: false
+            });
+        } else {
+            // Follow
+            const follow = await Users.findOneAndUpdate(
+                { _id: user_id },
+                {
+                    $push: { userFollowers: follow_id },
+                }
+            );
+            await Users.findOneAndUpdate(
+                { _id: follow_id },
+                {
+                    $push: { userFollowing: user_id },
+                },
+                { new: true }
+            );
+            // sendNotification(
+            //   follower.userNotificationToken,
+            //   "Follow",
+            //   `${user.userName} follow you`
+            // );
+            // const notificationFollo = {
+            //   userID: follower._id.toString(),
+            //   title: "Follow",
+            //   message: `${user.userName} follow you`,
+            // };
+            // await axios.post(
+            //   `${process.env.mainserverurl}/notification/createUsersNotification`,
+            //   notificationFollo
+            // );
+            // sendNotification(
+            //   user.userNotificationToken,
+            //   "Follow",
+            //   `You follow ${follower.userName}`
+            // );
+            // const followNotification = {
+            //   userID: user._id.toString(),
+            //   title: "Follow",
+            //   message: `You follow ${follower.userName}`,
+            // };
+            // await axios.post(
+            //   `${process.env.mainserverurl}/notification/createUsersNotification`,
+            //   followNotification
+            // );
+
+            if (!follow) {
+                return res.status(200).json({
+                    message: "follow not done",
+                    success: false,
+                });
+            }
+            return res.status(200).json({
+                message: "follow done",
+                success: true,
+                follow: true
+
+            });
+        }
+    } catch (err) {
+        return res.status(400).json({ success: false, message: err });
+    }
+};
+
+
+
 module.exports = {
     registerUser,
     loginUser,
+    getUserByUserID,
+    followOrUnfollow,
     updateUser: [uploadOptions.fields([{
         name: 'userimage', maxCount: 1
     }, {
