@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
+const ChatRoomController = require("./controllers/chatServices");
 
 app.use(cors());
 
@@ -37,7 +38,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", (data) => {
     // socket.join(chatroom);
     socket.join(data.user);
-    messageController.getChatRoomData(io, data);
+    ChatRoomController.getChatRoomData(io, data);
   });
   // Leave Chatroom
   socket.on("leaveRoom", ({ chatroom, user }) => {
@@ -46,7 +47,7 @@ io.on("connection", (socket) => {
   });
   // Send Message
   socket.on("sendMessage", (data) => {
-    messageController.sendMessages(io, data);
+    ChatRoomController.sendMessages(io, data);
   });
   // Get Chatroom Data
   // socket.on("getRoomDetails", (data) => {

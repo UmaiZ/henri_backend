@@ -33,7 +33,7 @@ const createChatRoom = async (req, res) => {
         const chatRoomExists = await ChatRoomsModel.findOne(Query);
         if (chatRoomExists) {
             return res.status(200).json({
-                status: "success",
+                success: true,
                 data: chatRoomExists,
                 message: "Chat room already exists",
             });
@@ -56,13 +56,13 @@ const createChatRoom = async (req, res) => {
         );
 
         res.status(200).json({
-            status: "success",
+            success: true,
             data: chatRoom,
             message: "Chat room created successfully",
         });
     } catch (error) {
         res.status(500).json({
-            status: "error",
+            success: false,
             message: error.message,
         });
     }
@@ -111,14 +111,14 @@ const getChatRooms = async (req, res) => {
         // );
 
         res.status(200).json({
-            status: "success",
+            success: true,
             data: chatRoomsWithMessages,
             message: "Chat rooms fetched successfully",
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            status: "error",
+            success: false,
             message: error.message,
         });
     }
