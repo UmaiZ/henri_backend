@@ -43,6 +43,12 @@ const newsFeedSchema = new mongoose.Schema(
         ref: "shareNewsFeed",
       },
     ],
+    rating: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ratingNewsFeed",
+      },
+    ],
     isDeleted: {
       type: Boolean,
       default: false,

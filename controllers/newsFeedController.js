@@ -4,6 +4,7 @@ const multer = require("multer");
 const commentNewsFeedModel = require("../model/commentNewsFeedModel");
 const likeNewsFeedModel = require("../model/likeNewsFeedModel");
 const newsFeedModel = require("../model/newsFeedModel");
+const ratingNewsFeedModel = require("../model/ratingnewsfeedModel");
 const shareNewsFeedModel = require("../model/shareNewsFeedModel");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 require("dotenv/config");
@@ -154,6 +155,7 @@ const getNewsFeed = async (req, res) => {
     const limitData = currentLimit;
 
     const newsFeed = await newsFeedModel.find({}).sort({ createdAt: -1 }).skip(skip).limit(limitData).populate([
+      "rating",
       {
         path: "createdBy",
         model: "users",
@@ -358,7 +360,102 @@ const likePost = async (req, res) => {
   }
 
 };
+const ratingPost = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const { newsFeedId } = req.params;
+    const { rating } = req.body;
 
+    // Check if newsfeed is already rating by user
+
+    const isRating = await ratingNewsFeedModel.findOne(
+
+      { $and: [{ newsFeedId: newsFeedId }, { ratingBy: user_id }] }
+
+
+
+    ).lean();
+
+
+    // Retrieve the post from the database
+
+    const post = await newsFeedModel.findById(newsFeedId).populate(['rating']);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    if (isRating) {
+
+      const ratingid = post.rating.find(obj => obj.ratingBy.toString() === user_id);
+
+
+      const ratingNewsFeed = await ratingNewsFeedModel.findByIdAndUpdate(
+        ratingid,
+        {
+          rating: rating
+        },
+        {
+          new: true,
+        });
+      return res.status(200).json({
+        success: true,
+        message: "News Feed rating updated successfully",
+        data: ratingNewsFeed,
+      });
+    }
+    // // Check if the post has already been rated
+    // if (post.rating) {
+    //   // Calculate the new rating by averaging the existing rating and the new rating
+    //   const newRating = (post.rating + rating) / 2;
+    //   post.rating = newRating;
+    //   // console.log(newRating);
+    // } else {
+    //   // If the post hasn't been rated before, set the rating to the new rating
+    //   post.rating = rating;
+    // }
+    // // console.log(newRating);
+
+    // // create rating on newsfees
+
+    const ratingNewsFeed = await ratingNewsFeedModel.create({
+      newsFeedId: newsFeedId,
+      ratingBy: user_id,
+      rating: rating
+    });
+
+
+    // Push rating NewsFeed Id in newsfeed model
+    const pushRatingNewsFeed = await newsFeedModel.findByIdAndUpdate(
+      newsFeedId,
+      {
+        $push: {
+          rating: ratingNewsFeed._id,
+        },
+      },
+      { new: true }
+    );
+    if (!ratingNewsFeed) {
+      return res.status(400).json({
+        success: false,
+        message: "News Feed Not Found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "News Feed rating Successfully",
+      data: ratingNewsFeed,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "internal server error",
+      error: error.message
+
+    })
+  }
+}
 const commentNewsFeed = async (req, res) => {
   try {
     const { user_id } = req.user;
@@ -422,6 +519,7 @@ const updateCommentNewsFeed = async (req, res) => {
         success: false,
         message: "News Feed Not Found",
       });
+      58
     }
 
     res.status(200).json({
@@ -517,5 +615,6 @@ module.exports = {
   commentNewsFeed,
   updateCommentNewsFeed,
   deleteCommentNewsFeed,
-  getCommentsOfFeed
+  getCommentsOfFeed,
+  ratingPost
 };

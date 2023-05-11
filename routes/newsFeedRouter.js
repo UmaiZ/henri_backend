@@ -14,5 +14,6 @@ router.post("/commentNewsFeed", auth, newsFeedController.commentNewsFeed);
 router.post("/updateCommentNewsFeed", auth, newsFeedController.updateCommentNewsFeed);
 router.post("/deleteCommentNewsFeed", auth, newsFeedController.deleteCommentNewsFeed);
 router.get("/newsFeedComment/:id", auth, newsFeedController.getCommentsOfFeed);
+router.post("/ratingnewsFeed/:newsFeedId", auth, newsFeedController.ratingPost);
 
 module.exports = router;
