@@ -354,12 +354,27 @@ const followOrUnfollow = async (req, res) => {
 };
 
 
+const getUsersFans = async (req, res) => {
+    try {
+        const user = await Users.find({ userFollowing: req.user.user_id });
+
+
+        return res
+            .status(200)
+            .json({ message: "success", success: true, data: user });
+    } catch (error) {
+
+    }
+};
+
+
 
 module.exports = {
     registerUser,
     loginUser,
     getUserByUserID,
     followOrUnfollow,
+    getUsersFans,
     updateUser: [uploadOptions.fields([{
         name: 'userimage', maxCount: 1
     }, {
