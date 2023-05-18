@@ -5,5 +5,6 @@ const statusController = require("../controllers/statusController");
 
 router.post("/createStatus", auth, statusController.createStatus);
 router.get("/getStatus", auth, statusController.getStatus);
+router.get("/getAverageRating",auth,statusController.getRatingAverage);
 
 module.exports = router;

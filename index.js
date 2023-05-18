@@ -20,7 +20,7 @@ const userRouter = require("./routes/user");
 const statusRouter = require("./routes/statusRouter");
 const chatRoomRouter = require("./routes/chatRouter");
 
-const responseHandler = require("./utils/ResponseHandler/responseHandler");
+// const responseHandler = require("./utils/ResponseHandler/responseHandler");
 
 app.use(chatRoomRouter);
 app.use(newsFeedRouter);
@@ -30,7 +30,7 @@ app.use(statusRouter);
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Server Running" });
 });
-app.use(responseHandler);
+// app.use(responseHandler);
 
 io.on("connection", (socket) => {
   // Join Chatroom

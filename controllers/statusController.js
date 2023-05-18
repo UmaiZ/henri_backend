@@ -1,10 +1,13 @@
 
 const { Status } = require("../model/status");
+const {Highlights} =require("../model/highlights");
+// const {ratingNewsFeedModel}=require("../model/ratingnewsfeedModel");
 const multer = require("multer");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 const { Users } = require("../model/user");
 const moment = require('moment');
 
+const newsFeedModel = require("../model/newsFeedModel");
 
 const uploadOptions = multer({
     storage: multer.memoryStorage(),
@@ -48,9 +51,11 @@ const createStatus = async (req, res) => {
                 fileName,
                 "newsFeed",
                 fileContent
-            );
+               );
         }
+         
 
+        //status create
         const status = await Status.create({
             statusText: text,
             statusImage: imageLocation,
@@ -59,6 +64,16 @@ const createStatus = async (req, res) => {
         });
         console.log(status)
 
+         //highlight create
+        const highlight=await Highlights.create({
+            highlightText:text,
+            highlightImage:imageLocation,
+            highlightVideo:videoLocaiton,
+            createdBy:user_id
+        })
+
+
+        console.log(highlight);
         res.status(200).json({
             success: true,
             message: "Status Added Successfully",
@@ -96,6 +111,56 @@ const getStatus = async (req, res) => {
     }
 };
 
+const getRatingAverage=async(req,res)=>{
+    try {        
+        
+    const posts = await newsFeedModel.find().populate(
+    
+        [
+
+            {
+                path: "rating",
+                model: "ratingNewsFeed",
+              },
+              {
+                path: "createdBy",
+                model: "users",
+              },
+        ]
+    );
+
+    if (posts.length === 0) {
+      return res.json({ averageRating: 0, postCount: 0 });
+    }
+
+    let totalRating = 0;
+    let postCount = 0;
+
+    posts.forEach(post => {
+      const ratings = post.rating;
+      if (ratings.length > 0) {
+        const ratingSum = ratings.reduce((sum, rating) => sum + rating.rating, 0);
+        totalRating += ratingSum;
+        postCount++;
+      }
+    });
+
+    const averageRating = totalRating / postCount;
+    res.json({averageRating, postCount });
+    // res.status(200).json({
+    //     success:true,
+    //     message:"average rating found",
+    //     data:[averageRating,postCount]
+    // })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success:false,
+            error:error.message
+        })
+    }
+}
 
 
 
@@ -107,5 +172,6 @@ module.exports = {
         name: 'video', maxCount: 1
     }]), createStatus],
     getStatus,
+    getRatingAverage
 
 };
