@@ -107,8 +107,10 @@ const loginUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+
+    
     console.log('hit')
-    if (req.body.userNameChanged) {
+    if (req.body.userName) {
         const usercheck = await Users.find({
             userName: req.body.userName,
         });
@@ -119,73 +121,148 @@ const updateUser = async (req, res) => {
         }
     }
 
+    // try {
+    //     var userImage = req.body.userImage;
+    //     if (req.file.userImage) {
+    //         console.log('saving image');
+    //         const file = req.files.userImage[0];
+    //         const fileName = file.originalname;
+    //         const fileContent = file.buffer;
+
+    //         const fileLocation = await uploadFileWithFolder(
+    //             fileName,
+    //             "newsFeed",
+    //             fileContent
+    //         );
+    //         userImage = fileLocation;
+    //     }
+
+    //     var userCover = req.body.userCover;
+          
+    //     console.log(req.file.userCover);
+    //     if (req.file.userCover) {
+    //         console.log('saving image');
+    //         const file = req.files.userCover[0];
+    //         const fileName = file.originalname;
+    //         const fileContent = file.buffer;
+
+    //         const fileLocation = await uploadFileWithFolder(
+    //             fileName,
+    //             "newsFeed",
+    //             fileContent
+    //         );
+    //         userCover = fileLocation;
+    //     }
+    //     const updateUser = await Users.findByIdAndUpdate(
+    //         req.user.user_id,
+    //         {
+    //             userEmail: req.body.userEmail,
+    //             userName: req.body.userName,
+    //             userCity: req.body.userCity,
+    //             userAddress: req.body.userAddress,
+    //             userCountry: req.body.userCountry,
+    //             userNumber: req.body.userNumber,
+    //             userSchool: req.body.userSchool,
+    //             userTeam: req.body.userTeam,
+    //             userCoaches: req.body.userCoaches,
+    //             userBio: req.body.userBio,
+    //             userSports: req.body.userSports,
+    //             userImage: userImage,
+    //             userCover: userCover
+    //         },
+    //         {
+    //             new: true,
+    //         }
+    //     );
+    //     res.status(200).json({
+    //         success: true,
+    //         data: updateUser,
+    //         message: "User saved successfully",
+    //     });
+    // } catch (err) {
+    //     console.log(err)
+    //     if (err.name === "ValidationError") {
+    //         console.error(Object.values(err.errors).map((val) => val.message));
+    //         return res.status(400).json({
+    //             success: false,
+    //             message: Object.values(err.errors).map((val) => val.message)[0],
+    //         });
+    //     }
+    //     return res.status(400).json({ success: false, message: err });
+    // }
+
+
     try {
-        var userImage = req.body.userImage;
-        if (req.files.userimage) {
-            console.log('saving image');
-            const file = req.files.userimage[0];
+        const { files } = req;
+
+
+        imageLocation = "";
+
+        coverimageLocation="";
+
+
+        if (files.image) {
+            const file = files.image[0];
             const fileName = file.originalname;
             const fileContent = file.buffer;
-
-            const fileLocation = await uploadFileWithFolder(
+            imageLocation = await uploadFileWithFolder(
                 fileName,
                 "newsFeed",
                 fileContent
             );
-            userImage = fileLocation;
         }
-
-        var userCover = req.body.userCover;
-        if (req.files.usercover) {
-            console.log('saving image');
-            const file = req.files.usercover[0];
+        if (files.coverimage) {
+            const file = files.coverimage[0];
             const fileName = file.originalname;
             const fileContent = file.buffer;
-
-            const fileLocation = await uploadFileWithFolder(
+            coverimageLocation = await uploadFileWithFolder(
                 fileName,
                 "newsFeed",
                 fileContent
             );
-            userCover = fileLocation;
         }
+    
         const updateUser = await Users.findByIdAndUpdate(
-            req.user.user_id,
-            {
-                userEmail: req.body.userEmail,
-                userName: req.body.userName,
-                userCity: req.body.userCity,
-                userAddress: req.body.userAddress,
-                userCountry: req.body.userCountry,
-                userNumber: req.body.userNumber,
-                userSchool: req.body.userSchool,
-                userTeam: req.body.userTeam,
-                userCoaches: req.body.userCoaches,
-                userBio: req.body.userBio,
-                userSports: req.body.userSports,
-                userImage: userImage,
-                userCover: userCover
-            },
-            {
-                new: true,
-            }
+          req.user.user_id,
+          {
+            userEmail: req.body.userEmail,
+            userName: req.body.userName,
+            userCity: req.body.userCity,
+            userAddress: req.body.userAddress,
+            userCountry: req.body.userCountry,
+            userNumber: req.body.userNumber,
+            userSchool: req.body.userSchool,
+            userTeam: req.body.userTeam,
+            userCoaches: req.body.userCoaches,
+            userBio: req.body.userBio,
+            userSports: req.body.userSports,
+            userImage:  imageLocation,
+            userCover: coverimageLocation
+          },
+          {
+            new: true
+          }
         );
+    
         res.status(200).json({
-            success: true,
-            data: updateUser,
-            message: "User saved successfully",
+          success: true,
+          data: updateUser,
+          message: 'User saved successfully'
         });
-    } catch (err) {
-        console.log(err)
-        if (err.name === "ValidationError") {
-            console.error(Object.values(err.errors).map((val) => val.message));
-            return res.status(400).json({
-                success: false,
-                message: Object.values(err.errors).map((val) => val.message)[0],
-            });
+      } catch (err) {
+        console.log(err);
+        if (err.name === 'ValidationError') {
+          console.error(
+            Object.values(err.errors).map((val) => val.message)
+          );
+          return res.status(400).json({
+            success: false,
+            message: Object.values(err.errors).map((val) => val.message)[0]
+          });
         }
         return res.status(400).json({ success: false, message: err });
-    }
+      }
+
 };
 
 
@@ -376,9 +453,9 @@ module.exports = {
     followOrUnfollow,
     getUsersFans,
     updateUser: [uploadOptions.fields([{
-        name: 'userimage', maxCount: 1
+        name: 'image', maxCount: 1
     }, {
-        name: 'usercover', maxCount: 1
+        name: 'coverimage', maxCount: 1
     }]), updateUser],
 
 };

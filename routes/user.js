@@ -9,13 +9,10 @@ router.post("/register", limiter, userController.registerUser);
 router.post("/login", limiter, userController.loginUser);
 router.post("/updateUser", limiter, auth, userController.updateUser);
 router.get("/getUserByUserID/:id", limiter, userController.getUserByUserID);
-router.post("/updateUser", limiter, auth, userController.updateUser);
+// router.post("/updateUser", limiter, auth, userController.updateUser);
 
 router.post("/followOrUnfollow", limiter, auth, userController.followOrUnfollow);
 router.get("/getUsersFans", limiter, auth, userController.getUsersFans);
-
-
-
 
 
 

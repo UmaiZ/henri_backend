@@ -68,9 +68,9 @@ const addNewsFeed = async (req, res) => {
 
 const updateNewsFeed = async (req, res) => {
   try {
-    const { newsFeedId } = req.params;
+    const { id } = req.params;
     const { title, description } = req.body;
-    const { files } = req.files;
+    const { files } = req;
     const { user_id } = req.user;
     const images = [];
 
@@ -87,7 +87,7 @@ const updateNewsFeed = async (req, res) => {
     }
 
     const newsFeed = await newsFeedModel.findByIdAndUpdate(
-      newsFeedId,
+      id,
       {
         title: title,
         description: description,
@@ -113,11 +113,11 @@ const updateNewsFeed = async (req, res) => {
 
 const deleteNewsFeed = async (req, res) => {
   try {
-    const { newsFeedId } = req.params;
+    const { id} = req.params;
     const { user_id } = req.user;
 
     const newsFeed = await newsFeedModel.findByIdAndUpdate(
-      newsFeedId,
+      id,
       {
         isDeleted: true,
       },
@@ -360,6 +360,170 @@ const likePost = async (req, res) => {
   }
 
 };
+
+const commentNewsFeed = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const { newsFeedId, commentDetail } = req.body;
+
+    const commentNewsFeed = await commentNewsFeedModel.create({
+      newsFeedId: newsFeedId,
+      commentDetail: commentDetail,
+      commentBy: user_id,
+    });
+
+    // Push Comment NewsFeed Id in newsfeed model
+    const pushCommentNewsFeed = await newsFeedModel.findByIdAndUpdate(
+      newsFeedId,
+      {
+        $push: {
+          comment: commentNewsFeed._id,
+        },
+      },
+      { new: true }
+    );
+
+    if (!pushCommentNewsFeed) {
+      return res.status(400).json({
+        success: false,
+        message: "News Feed Not Found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "News Feed Commented Successfully",
+      data: pushCommentNewsFeed,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const updateCommentNewsFeed = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const { comentID, commentDetail } = req.body;
+
+    const commentNewsFeed = await commentNewsFeedModel.findByIdAndUpdate(
+      comentID,
+      {
+        commentDetail: commentDetail,
+      },
+      { new: true }
+    );
+
+    if (!commentNewsFeed) {
+      return res.status(400).json({
+        success: false,
+        message: "News Feed Not Found",
+      });
+      58
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "News Feed Commented Successfully",
+      data: commentNewsFeed,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const deleteCommentNewsFeed = async (req, res) => {
+  try {
+    // const { user_id } = req.user;
+    const { comentID } = req.body;
+
+    // const commentNewsFeed = await commentNewsFeedModel.findByIdAndDelete(
+    //   comentID
+    // );
+    // //
+    
+    // if (commentNewsFeed) {
+    //   // Unfollow
+    //   const deleteidinnewsfeedmodel = await newsFeedModel.findOneAndUpdate(
+    //       { _id: user_id },
+    //       {
+    //           $pull: { comment: comentID },
+    //       }
+    //   );
+    //     }
+    // if (!commentNewsFeed) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "News Feed Not Found",
+    //   });
+    // }
+
+ // Step 1: Delete the comment
+ await commentNewsFeedModel.findByIdAndDelete(comentID);
+
+ // Step 2: Remove the comment ID from the comments array in the NewsFeed model
+ await newsFeedModel.updateOne(
+   { comment: comentID },
+   { $pull: { comment: comentID } }
+ );
+
+    res.status(200).json({
+      success: true,
+      message: "Comment Deleted Successfully",
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const getCommentsOfFeed = async (req, res) => {
+  try {
+         const {user_id}=req.user;
+    const newsFeed = await commentNewsFeedModel.find({commentBy:user_id })
+    
+    
+    
+    .populate([
+    
+      {
+        path: "commentBy",
+        model: "users",
+      },
+     
+    ]);
+    
+  
+    res.status(200).json({
+      success: true,
+      message: "Comments of  News Feed Fetched Successfully",
+      data: newsFeed,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 const ratingPost = async (req, res) => {
   try {
     const { user_id } = req.user;
@@ -456,151 +620,76 @@ const ratingPost = async (req, res) => {
     })
   }
 }
-const commentNewsFeed = async (req, res) => {
-  try {
-    const { user_id } = req.user;
-    const { newsFeedId, commentDetail } = req.body;
 
-    const commentNewsFeed = await commentNewsFeedModel.create({
-      newsFeedId: newsFeedId,
-      commentDetail: commentDetail,
-      commentBy: user_id,
-    });
+const getRatingAverage=async(req,res)=>{
+    try {        
+        
+    const posts = await newsFeedModel.find().populate(
+    
+        [
 
-    // Push Comment NewsFeed Id in newsfeed model
-    const pushCommentNewsFeed = await newsFeedModel.findByIdAndUpdate(
-      newsFeedId,
-      {
-        $push: {
-          comment: commentNewsFeed._id,
-        },
-      },
-      { new: true }
+            {
+                path: "rating",
+                model: "ratingNewsFeed",
+              },
+
+              {
+                path: "createdBy",
+                model: "users",
+              },
+              
+        ]
     );
 
-    if (!pushCommentNewsFeed) {
-      return res.status(400).json({
-        success: false,
-        message: "News Feed Not Found",
-      });
+    if (posts.length === 0) {
+      return res.json({ averageRating: 0, postCount: 0 });
     }
 
+    let totalRating = 0;
+    let postCount = 0;
+
+
+    posts.forEach(post => {
+      const ratings = post.rating;
+      if (ratings.length > 0) {
+        const ratingSum = ratings.reduce((sum, rating) => sum + rating.rating, 0);
+        totalRating += ratingSum;
+        postCount++;
+      }
+    });
+
+    
+
+    const averageRating = totalRating / postCount;
+
+
+    //get username which user is rate on post
+
+    const usernames=[];
+
+    posts.forEach(item=>{
+        const userinfo=item.createdBy;
+        const userName=userinfo.userName 
+          
+        console.log(userName);
+        usernames.push(userName)
+    })
+    
     res.status(200).json({
-      success: true,
-      message: "News Feed Commented Successfully",
-      data: pushCommentNewsFeed,
-    });
+        success:true,
+        message:"average rating found",
+        averageRating,postCount,
+        usernames:usernames
+    })
 
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-const updateCommentNewsFeed = async (req, res) => {
-  try {
-    const { user_id } = req.user;
-    const { comentID, commentDetail } = req.body;
-
-    const commentNewsFeed = await commentNewsFeedModel.findByIdAndUpdate(
-      comentID,
-      {
-        commentDetail: commentDetail,
-      },
-      { new: true }
-    );
-
-    if (!commentNewsFeed) {
-      return res.status(400).json({
-        success: false,
-        message: "News Feed Not Found",
-      });
-      58
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success:false,
+            error:error.message
+        })
     }
-
-    res.status(200).json({
-      success: true,
-      message: "News Feed Commented Successfully",
-      data: commentNewsFeed,
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-const deleteCommentNewsFeed = async (req, res) => {
-  try {
-    const { user_id } = req.user;
-    const { comentID } = req.body;
-
-    const commentNewsFeed = await commentNewsFeedModel.findByIdAndDelete(
-      comentID
-    );
-
-    if (!commentNewsFeed) {
-      return res.status(400).json({
-        success: false,
-        message: "News Feed Not Found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Comment Deleted Successfully",
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-const getCommentsOfFeed = async (req, res) => {
-  try {
-
-    const newsFeed = await commentNewsFeedModel.find({ 'newsFeedId': req.params.id }).populate([
-      // {
-      //   path: "like",
-      //   model: "likeNewsFeed",
-      // },
-      {
-        path: "commentBy",
-        model: "users",
-      },
-      // {
-      //   path: "share",
-      //   model: "shareNewsFeed",
-      // }
-    ]);/*  */
-    res.status(200).json({
-      success: true,
-      message: "News Feed Fetched Successfully",
-      data: newsFeed,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-
+}
 
 
 module.exports = {
@@ -616,5 +705,7 @@ module.exports = {
   updateCommentNewsFeed,
   deleteCommentNewsFeed,
   getCommentsOfFeed,
-  ratingPost
+  ratingPost,
+  getRatingAverage
+
 };

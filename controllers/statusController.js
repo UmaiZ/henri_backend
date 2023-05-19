@@ -111,67 +111,14 @@ const getStatus = async (req, res) => {
     }
 };
 
-const getRatingAverage=async(req,res)=>{
-    try {        
-        
-    const posts = await newsFeedModel.find().populate(
-    
-        [
-
-            {
-                path: "rating",
-                model: "ratingNewsFeed",
-              },
-              {
-                path: "createdBy",
-                model: "users",
-              },
-        ]
-    );
-
-    if (posts.length === 0) {
-      return res.json({ averageRating: 0, postCount: 0 });
-    }
-
-    let totalRating = 0;
-    let postCount = 0;
-
-    posts.forEach(post => {
-      const ratings = post.rating;
-      if (ratings.length > 0) {
-        const ratingSum = ratings.reduce((sum, rating) => sum + rating.rating, 0);
-        totalRating += ratingSum;
-        postCount++;
-      }
-    });
-
-    const averageRating = totalRating / postCount;
-    res.json({averageRating, postCount });
-    // res.status(200).json({
-    //     success:true,
-    //     message:"average rating found",
-    //     data:[averageRating,postCount]
-    // })
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            success:false,
-            error:error.message
-        })
-    }
-}
-
-
 
 
 module.exports = {
-    createStatus: [uploadOptions.fields([{
+          createStatus: [uploadOptions.fields([{
         name: 'image', maxCount: 1
     }, {
-        name: 'video', maxCount: 1
+        name: 'video', maxCount: 1 
     }]), createStatus],
     getStatus,
-    getRatingAverage
 
 };
