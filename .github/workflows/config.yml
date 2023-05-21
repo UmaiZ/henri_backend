@@ -22,5 +22,5 @@ jobs:
         sudo chown -R $USER:$USER $GITHUB_WORKSPACE
     - uses: actions/checkout@v3
     - run: sudo npm i 
-    - run: pm2 kill -a
-    - run: pm2 start index.js 
+    - run: sudo pm2 kill -a
+    - run: sudo pm2 start index.js 
