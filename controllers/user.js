@@ -121,107 +121,38 @@ const updateUser = async (req, res) => {
         }
     }
 
-    // try {
-    //     var userImage = req.body.userImage;
-    //     if (req.file.userImage) {
-    //         console.log('saving image');
-    //         const file = req.files.userImage[0];
-    //         const fileName = file.originalname;
-    //         const fileContent = file.buffer;
-
-    //         const fileLocation = await uploadFileWithFolder(
-    //             fileName,
-    //             "newsFeed",
-    //             fileContent
-    //         );
-    //         userImage = fileLocation;
-    //     }
-
-    //     var userCover = req.body.userCover;
-
-    //     console.log(req.file.userCover);
-    //     if (req.file.userCover) {
-    //         console.log('saving image');
-    //         const file = req.files.userCover[0];
-    //         const fileName = file.originalname;
-    //         const fileContent = file.buffer;
-
-    //         const fileLocation = await uploadFileWithFolder(
-    //             fileName,
-    //             "newsFeed",
-    //             fileContent
-    //         );
-    //         userCover = fileLocation;
-    //     }
-    //     const updateUser = await Users.findByIdAndUpdate(
-    //         req.user.user_id,
-    //         {
-    //             userEmail: req.body.userEmail,
-    //             userName: req.body.userName,
-    //             userCity: req.body.userCity,
-    //             userAddress: req.body.userAddress,
-    //             userCountry: req.body.userCountry,
-    //             userNumber: req.body.userNumber,
-    //             userSchool: req.body.userSchool,
-    //             userTeam: req.body.userTeam,
-    //             userCoaches: req.body.userCoaches,
-    //             userBio: req.body.userBio,
-    //             userSports: req.body.userSports,
-    //             userImage: userImage,
-    //             userCover: userCover
-    //         },
-    //         {
-    //             new: true,
-    //         }
-    //     );
-    //     res.status(200).json({
-    //         success: true,
-    //         data: updateUser,
-    //         message: "User saved successfully",
-    //     });
-    // } catch (err) {
-    //     console.log(err)
-    //     if (err.name === "ValidationError") {
-    //         console.error(Object.values(err.errors).map((val) => val.message));
-    //         return res.status(400).json({
-    //             success: false,
-    //             message: Object.values(err.errors).map((val) => val.message)[0],
-    //         });
-    //     }
-    //     return res.status(400).json({ success: false, message: err });
-    // }
-
-
     try {
-        const { files } = req;
-
-
-        imageLocation = "";
-
-        coverimageLocation = "";
-
-
-        if (files.image) {
-            const file = files.image[0];
+        var userImage = req.body.userImage;
+        if (req.file.userImage) {
+            console.log('saving image');
+            const file = req.files.userImage[0];
             const fileName = file.originalname;
             const fileContent = file.buffer;
-            imageLocation = await uploadFileWithFolder(
+
+            const fileLocation = await uploadFileWithFolder(
                 fileName,
                 "newsFeed",
                 fileContent
             );
+            userImage = fileLocation;
         }
-        if (files.coverimage) {
-            const file = files.coverimage[0];
+
+        var userCover = req.body.userCover;
+
+        console.log(req.file.userCover);
+        if (req.file.userCover) {
+            console.log('saving image');
+            const file = req.files.userCover[0];
             const fileName = file.originalname;
             const fileContent = file.buffer;
-            coverimageLocation = await uploadFileWithFolder(
+
+            const fileLocation = await uploadFileWithFolder(
                 fileName,
                 "newsFeed",
                 fileContent
             );
+            userCover = fileLocation;
         }
-
         const updateUser = await Users.findByIdAndUpdate(
             req.user.user_id,
             {
@@ -236,32 +167,31 @@ const updateUser = async (req, res) => {
                 userCoaches: req.body.userCoaches,
                 userBio: req.body.userBio,
                 userSports: req.body.userSports,
-                userImage: imageLocation,
-                userCover: coverimageLocation
+                userImage: userImage,
+                userCover: userCover
             },
             {
-                new: true
+                new: true,
             }
         );
-
         res.status(200).json({
             success: true,
             data: updateUser,
-            message: 'User saved successfully'
+            message: "User saved successfully",
         });
     } catch (err) {
-        console.log(err);
-        if (err.name === 'ValidationError') {
-            console.error(
-                Object.values(err.errors).map((val) => val.message)
-            );
+        console.log(err)
+        if (err.name === "ValidationError") {
+            console.error(Object.values(err.errors).map((val) => val.message));
             return res.status(400).json({
                 success: false,
-                message: Object.values(err.errors).map((val) => val.message)[0]
+                message: Object.values(err.errors).map((val) => val.message)[0],
             });
         }
         return res.status(400).json({ success: false, message: err });
     }
+
+
 
 };
 
