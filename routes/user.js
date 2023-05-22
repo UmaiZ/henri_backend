@@ -13,6 +13,7 @@ router.get("/getUserByUserID/:id", limiter, userController.getUserByUserID);
 
 router.post("/followOrUnfollow", limiter, auth, userController.followOrUnfollow);
 router.get("/getUsersFans", limiter, auth, userController.getUsersFans);
+router.get("/getUserTeamMates", limiter, auth, userController.getUserTeamMates);
 
 
 

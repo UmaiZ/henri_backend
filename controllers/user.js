@@ -22,14 +22,14 @@ const registerUser = async (req, res) => {
             .json({ message: "user email already exist", success: false });
     }
     // Const Match Regex for password 
-    const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+    // const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
     if (!req.body.isSocial) {
-        if (!passwordRegex.test(req.body.userPassword)) {
-            return res.status(200).json({
-                success: false,
-                message: "Password must be 8 characters long and must contain at least one uppercase letter, one lowercase letter, one number and one special character.",
-            });
-        }
+        // if (!passwordRegex.test(req.body.userPassword)) {
+        //     return res.status(200).json({
+        //         success: false,
+        //         message: "Password must be 8 characters long and must contain at least one uppercase letter, one lowercase letter, one number and one special character.",
+        //     });
+        // }
     }
     const user = Users({
         userEmail: req.body.userEmail,
@@ -108,7 +108,7 @@ const loginUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
 
-    
+
     console.log('hit')
     if (req.body.userName) {
         const usercheck = await Users.find({
@@ -138,7 +138,7 @@ const updateUser = async (req, res) => {
     //     }
 
     //     var userCover = req.body.userCover;
-          
+
     //     console.log(req.file.userCover);
     //     if (req.file.userCover) {
     //         console.log('saving image');
@@ -198,7 +198,7 @@ const updateUser = async (req, res) => {
 
         imageLocation = "";
 
-        coverimageLocation="";
+        coverimageLocation = "";
 
 
         if (files.image) {
@@ -221,47 +221,47 @@ const updateUser = async (req, res) => {
                 fileContent
             );
         }
-    
+
         const updateUser = await Users.findByIdAndUpdate(
-          req.user.user_id,
-          {
-            userEmail: req.body.userEmail,
-            userName: req.body.userName,
-            userCity: req.body.userCity,
-            userAddress: req.body.userAddress,
-            userCountry: req.body.userCountry,
-            userNumber: req.body.userNumber,
-            userSchool: req.body.userSchool,
-            userTeam: req.body.userTeam,
-            userCoaches: req.body.userCoaches,
-            userBio: req.body.userBio,
-            userSports: req.body.userSports,
-            userImage:  imageLocation,
-            userCover: coverimageLocation
-          },
-          {
-            new: true
-          }
+            req.user.user_id,
+            {
+                userEmail: req.body.userEmail,
+                userName: req.body.userName,
+                userCity: req.body.userCity,
+                userAddress: req.body.userAddress,
+                userCountry: req.body.userCountry,
+                userNumber: req.body.userNumber,
+                userSchool: req.body.userSchool,
+                userTeam: req.body.userTeam,
+                userCoaches: req.body.userCoaches,
+                userBio: req.body.userBio,
+                userSports: req.body.userSports,
+                userImage: imageLocation,
+                userCover: coverimageLocation
+            },
+            {
+                new: true
+            }
         );
-    
+
         res.status(200).json({
-          success: true,
-          data: updateUser,
-          message: 'User saved successfully'
+            success: true,
+            data: updateUser,
+            message: 'User saved successfully'
         });
-      } catch (err) {
+    } catch (err) {
         console.log(err);
         if (err.name === 'ValidationError') {
-          console.error(
-            Object.values(err.errors).map((val) => val.message)
-          );
-          return res.status(400).json({
-            success: false,
-            message: Object.values(err.errors).map((val) => val.message)[0]
-          });
+            console.error(
+                Object.values(err.errors).map((val) => val.message)
+            );
+            return res.status(400).json({
+                success: false,
+                message: Object.values(err.errors).map((val) => val.message)[0]
+            });
         }
         return res.status(400).json({ success: false, message: err });
-      }
+    }
 
 };
 
@@ -308,55 +308,24 @@ const followOrUnfollow = async (req, res) => {
         // Check already follow or not
         const checkFollow = await Users.findOne({
             _id: user_id,
-            userFollowers: { $in: [follow_id] },
+            userFollowing: { $in: [follow_id] },
         }).lean();
         if (checkFollow) {
             // Unfollow
             const unfollow = await Users.findOneAndUpdate(
                 { _id: user_id },
                 {
-                    $pull: { userFollowers: follow_id },
+                    $pull: { userFollowing: follow_id },
                 }
             );
             await Users.findOneAndUpdate(
                 { _id: follow_id },
                 {
-                    $pull: { userFollowing: user_id },
+                    $pull: { userFollowers: user_id },
                 },
                 { new: true }
             );
-            // sendNotification(
-            //   follower.userNotificationToken,
-            //   "Unfollow",
-            //   `${user.userName} unfollow you`
-            // );
-            // const followFolNotification = {
-            //   userID: follower._id.toString(),
-            //   title: "Unfollow",
-            //   message: `${user.userName} unfollow you`,
-            // };
-            // await axios
-            //   .post(
-            //     `${process.env.mainserverurl}/notification/createUsersNotification`,
-            //     followFolNotification
-            //   )
-            //   .catch((err) => {
-            //     console.log(err);
-            //   });
-            // sendNotification(
-            //   user.userNotificationToken,
-            //   "Unfollow",
-            //   `You unfollow ${follower.userName}`
-            // );
-            // const unfollowUserNotification = {
-            //   userID: user._id.toString(),
-            //   title: "Unfollow",
-            //   message: `You unfollow ${follower.userName}`,
-            // };
-            // await axios.post(
-            //   `${process.env.mainserverurl}/notification/createUsersNotification`,
-            //   unfollowUserNotification
-            // );
+
             if (!unfollow) {
                 return res.status(200).json({
                     message: "unfollow not done",
@@ -373,13 +342,13 @@ const followOrUnfollow = async (req, res) => {
             const follow = await Users.findOneAndUpdate(
                 { _id: user_id },
                 {
-                    $push: { userFollowers: follow_id },
+                    $push: { userFollowing: follow_id },
                 }
             );
             await Users.findOneAndUpdate(
                 { _id: follow_id },
                 {
-                    $push: { userFollowing: user_id },
+                    $push: { userFollowers: user_id },
                 },
                 { new: true }
             );
@@ -433,14 +402,28 @@ const followOrUnfollow = async (req, res) => {
 
 const getUsersFans = async (req, res) => {
     try {
-        const user = await Users.find({ userFollowing: req.user.user_id });
-
-
+        const user = await Users.findById(req.user.user_id).populate(['userFollowers']);
         return res
             .status(200)
-            .json({ message: "success", success: true, data: user });
-    } catch (error) {
+            .json({ message: "success", success: true, data: user.userFollowers });
+    } catch (err) {
+        return res.status(400).json({ success: false, message: err });
+    }
+};
 
+
+const getUserTeamMates = async (req, res) => {
+    try {
+        const user = await Users.findById(req.user.user_id).populate(['userFollowers', 'userFollowing']);
+
+
+
+        const commonObjects = user.userFollowers.filter(obj1 => user.userFollowing.some(obj2 => obj2.userName === obj1.userName));
+        return res
+            .status(200)
+            .json({ message: "success", success: true, data: commonObjects });
+    } catch (err) {
+        return res.status(400).json({ success: false, message: err });
     }
 };
 
@@ -451,6 +434,7 @@ module.exports = {
     loginUser,
     getUserByUserID,
     followOrUnfollow,
+    getUserTeamMates,
     getUsersFans,
     updateUser: [uploadOptions.fields([{
         name: 'image', maxCount: 1

@@ -113,7 +113,7 @@ const updateNewsFeed = async (req, res) => {
 
 const deleteNewsFeed = async (req, res) => {
   try {
-    const { id} = req.params;
+    const { id } = req.params;
     const { user_id } = req.user;
 
     const newsFeed = await newsFeedModel.findByIdAndUpdate(
@@ -424,7 +424,6 @@ const updateCommentNewsFeed = async (req, res) => {
         success: false,
         message: "News Feed Not Found",
       });
-      58
     }
 
     res.status(200).json({
@@ -452,7 +451,7 @@ const deleteCommentNewsFeed = async (req, res) => {
     //   comentID
     // );
     // //
-    
+
     // if (commentNewsFeed) {
     //   // Unfollow
     //   const deleteidinnewsfeedmodel = await newsFeedModel.findOneAndUpdate(
@@ -469,14 +468,14 @@ const deleteCommentNewsFeed = async (req, res) => {
     //   });
     // }
 
- // Step 1: Delete the comment
- await commentNewsFeedModel.findByIdAndDelete(comentID);
+    // Step 1: Delete the comment
+    await commentNewsFeedModel.findByIdAndDelete(comentID);
 
- // Step 2: Remove the comment ID from the comments array in the NewsFeed model
- await newsFeedModel.updateOne(
-   { comment: comentID },
-   { $pull: { comment: comentID } }
- );
+    // Step 2: Remove the comment ID from the comments array in the NewsFeed model
+    await newsFeedModel.updateOne(
+      { comment: comentID },
+      { $pull: { comment: comentID } }
+    );
 
     res.status(200).json({
       success: true,
@@ -495,21 +494,21 @@ const deleteCommentNewsFeed = async (req, res) => {
 
 const getCommentsOfFeed = async (req, res) => {
   try {
-         const {user_id}=req.user;
-    const newsFeed = await commentNewsFeedModel.find({commentBy:user_id })
-    
-    
-    
-    .populate([
-    
-      {
-        path: "commentBy",
-        model: "users",
-      },
-     
-    ]);
-    
-  
+    const { user_id } = req.user;
+    const newsFeed = await commentNewsFeedModel.find({ commentBy: user_id })
+
+
+
+      .populate([
+
+        {
+          path: "commentBy",
+          model: "users",
+        },
+
+      ]);
+
+
     res.status(200).json({
       success: true,
       message: "Comments of  News Feed Fetched Successfully",
@@ -621,24 +620,25 @@ const ratingPost = async (req, res) => {
   }
 }
 
-const getRatingAverage=async(req,res)=>{
-    try {        
-        
+const getRatingAverage = async (req, res) => {
+  try {
+
     const posts = await newsFeedModel.find().populate(
-    
-        [
 
-            {
-                path: "rating",
-                model: "ratingNewsFeed",
-              },
+      [
+        "rating",
 
-              {
-                path: "createdBy",
-                model: "users",
-              },
-              
-        ]
+        "rating.ratingBy"
+
+        // {
+        //   path: "rating",
+        //   populate: {
+        //     path: 'ratingBy',
+        //     model: 'user'
+        //   }
+        // },
+
+      ]
     );
 
     if (posts.length === 0) {
@@ -648,47 +648,55 @@ const getRatingAverage=async(req,res)=>{
     let totalRating = 0;
     let postCount = 0;
 
+    const ratingsadd = [];
 
     posts.forEach(post => {
       const ratings = post.rating;
       if (ratings.length > 0) {
         const ratingSum = ratings.reduce((sum, rating) => sum + rating.rating, 0);
-        totalRating += ratingSum;
+        const averageRating = (ratingSum / (ratings.length * 5)) * 5;
+        ratingsadd.push({
+          'count': averageRating,
+          'description': post.description,
+          'images': post.images,
+          'createdAt': post.createdAt,
+
+        });
+        totalRating += averageRating;
         postCount++;
       }
     });
 
-    
-
     const averageRating = totalRating / postCount;
-
-
     //get username which user is rate on post
 
-    const usernames=[];
 
-    posts.forEach(item=>{
-        const userinfo=item.createdBy;
-        const userName=userinfo.userName 
-          
-        console.log(userName);
-        usernames.push(userName)
-    })
-    
+    // posts.forEach(item => {
+    //   console.log(item);
+
+    //   const userinfo = item.createdBy;
+    //   const userName = userinfo.userName
+
+    //   console.log(userName);
+    //   usernames.push(userName)
+    // })
+
     res.status(200).json({
-        success:true,
-        message:"average rating found",
-        averageRating,postCount,
-        usernames:usernames
+      success: true,
+      message: "average rating found",
+      data: {
+        averageRating, postCount,
+        ratings: ratingsadd
+      }
     })
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            success:false,
-            error:error.message
-        })
-    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    })
+  }
 }
 
 
