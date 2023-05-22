@@ -43,7 +43,9 @@ io.on("connection", (socket) => {
   // Leave Chatroom
   socket.on("leaveRoom", ({ chatroom, user }) => {
     // socket.leave(chatroom);
+
     socket.leave(user);
+
   });
   // Send Message
   socket.on("sendMessage", (data) => {

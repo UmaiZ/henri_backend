@@ -6,7 +6,6 @@ const multer = require("multer");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 const { Users } = require("../model/user");
 const moment = require('moment');
-
 const newsFeedModel = require("../model/newsFeedModel");
 
 const uploadOptions = multer({
@@ -16,91 +15,93 @@ const uploadOptions = multer({
     // },
 });
 
+
+
 const createStatus = async (req, res) => {
     try {
-        const { text } = req.body;
-        const { files } = req;
-        const { user_id } = req.user;
-        const images = [];
-        // if (title == undefined || description == undefined || title == "" || description == "" || title == null || description == null) {
-        //   return res.status(400).json({
-        //     success: false,
-        //     message: "Title and Description are required",
-        //   });
-        // }
-        imageLocation = "";
-        videoLocaiton = "";
-
-        if (files.image) {
-            const file = files.image[0];
-            const fileName = file.originalname;
-            const fileContent = file.buffer;
-            imageLocation = await uploadFileWithFolder(
-                fileName,
-                "newsFeed",
-                fileContent
-            );
+      const { text } = req.body;
+      const { files } = req;
+      const { user_id } = req.user;
+      const images = [];
+  
+      let imageLocation = "";
+      let videoLocation = "";
+  
+      if (files.image) {
+        const file = files.image[0];
+        const fileName = file.originalname;
+        const fileContent = file.buffer;
+        imageLocation = await uploadFileWithFolder(fileName, "newsFeed", fileContent);
+      }
+  
+      if (files.video) {
+        const file = files.video[0];
+        const fileName = file.originalname;
+        const fileContent = file.buffer;
+        videoLocation = await uploadFileWithFolder(fileName, "newsFeed", fileContent);
+      }
+  
+      // Status create
+      const status = await Status.create({
+        statusText: text,
+        statusImage: imageLocation,
+        statusVideo: videoLocation,
+        createdBy: user_id,
+      });
+    //   console.log(status);
+  
+      // Highlight create
+      const highlight = await Highlights.create({
+        highlightText: text,
+        highlightImage: imageLocation,
+        highlightVideo: videoLocation,
+        createdBy: user_id,
+      });
+ 
+    setTimeout(async () => {
+        try {
+          const deletedStatus = await Status.findByIdAndDelete({_id:status._id});
+          console.log(deletedStatus);
+          console.log(`Deleted status with ID: ${deletedStatus._id}`);
+        } catch (error) {
+          console.log('An error occurred while deleting the status:', error);
         }
+      }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+      
+      res.status(200).json({
+        success: true,
+        message: "Status Added Successfully",
+        data: status,
+      });
 
-
-        if (files.video) {
-            const file = files.video[0];
-            const fileName = file.originalname;
-            const fileContent = file.buffer;
-            videoLocaiton = await uploadFileWithFolder(
-                fileName,
-                "newsFeed",
-                fileContent
-               );
-        }
-         
-
-        //status create
-        const status = await Status.create({
-            statusText: text,
-            statusImage: imageLocation,
-            statusVideo: videoLocaiton,
-            createdBy: user_id
-        });
-        console.log(status)
-
-         //highlight create
-        const highlight=await Highlights.create({
-            highlightText:text,
-            highlightImage:imageLocation,
-            highlightVideo:videoLocaiton,
-            createdBy:user_id
-        })
-
-
-        console.log(highlight);
-        res.status(200).json({
-            success: true,
-            message: "Status Added Successfully",
-            data: status,
-        });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-            error: error.message,
-        });
+      console.log(error);
+      res.status(500).json({
+        success: false, 
+        message: "Internal Server Error",
+        error: error.message,
+      });
     }
-};
+  };
+  
+
 
 const getStatus = async (req, res) => {
     try {
 
-        const statuses = await Status.find({ createdAt: { $gte: moment().subtract(1, 'day').toDate() } }).populate('createdBy');
-        const formattedStatuses = statuses.map(status => ({
-            statusText: status.statusText,
-            statusImage: status.statusImage,
-            statusVideo: status.statusVideo,
-            createdBy: status.createdBy,
-            createdAt: moment(status.createdAt).format('YYYY-MM-DD HH:mm:ss')
-        }));
-        res.send(formattedStatuses);
+        const userStatus = await Status.find().populate('createdBy');
+       
+        if(!userStatus){
+            return res.status(400).json({
+                success:false,
+                message:"status not found"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"status found successfully",
+            data:userStatus
+        })
     } catch (error) {
         console.log(error);
         res.status(500).json({
