@@ -1,0 +1,24 @@
+{"level":"info","message":"User authenticated successfully"}
+{"level":"info","message":"User authenticated successfully"}
+{"level":"info","message":"User authenticated successfully"}
+{"level":"info","message":"User register successfully","userName":"fahad"}
+{"level":"info","message":"User register successfully"}
+{"level":"info","message":"User update successfully","userName":"fahadshikari"}
+{"level":"info","message":"User found successfully"}
+{"level":"info","message":"User found successfully"}
+{"level":"info","message":"User not found"}
+{"level":"info","message":"User found successfully"}
+{"level":"info","message":"following"}
+{"level":"info","message":"get user fans"}
+{"level":"info","message":"get user fans"}
+{"level":"info","message":"status created succesfully"}
+{"level":"info","message":"status found"}
+{"level":"info","message":"newsfeed create succesfully","title":"title"}
+{"level":"info","message":"fetch news feed"}
+{"level":"info","message":"fetch news feed by id"}
+{"level":"info","message":"newsfeed update successfully","title":"title2"}
+{"level":"info","message":"newsfeed delete"}
+{"level":"info","message":"news feed shared"}
+{"level":"info","message":"news feed liked"}
+{"level":"info","message":"news feed rated"}
+{"level":"info","message":"avarage rated found"}

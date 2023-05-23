@@ -3,6 +3,10 @@ var bcrypt = require("bcryptjs");
 const { Users } = require("../model/user");
 const multer = require("multer");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
+const {loggerInfo,loggerError}  = require('../utils/log');
+
+// var loggerError=require("../utils/log");
+
 
 const uploadOptions = multer({
     storage: multer.memoryStorage(),
@@ -10,6 +14,7 @@ const uploadOptions = multer({
         fileSize: 5 * 1024 * 1024,
     },
 });
+
 
 
 const registerUser = async (req, res) => {
@@ -38,6 +43,10 @@ const registerUser = async (req, res) => {
             ? ""
             : bcrypt.hashSync(req.body.userPassword, 8),
     });
+
+    if(!user){
+        loggerError.error('User register failed', { userName: req.body.userName });
+    }
     const token = jwt.sign({ user_id: user._id }, process.env.TOKEN_KEY, {
         expiresIn: "7d",
     });
@@ -45,15 +54,18 @@ const registerUser = async (req, res) => {
     user.userToken = token;
     try {
         const usersave = await user.save();
+        loggerInfo.info('User register successfully', { userName: req.body.userName });
         res.status(200).json({
             success: true,
             data: usersave,
             message: "User saved successfully",
         });
     } catch (err) {
+        loggerError.error('An error occurred', { error: err });
+
         if (err.name === "ValidationError") {
             console.error(Object.values(err.errors).map((val) => val.message));
-            return res.status(400).json({
+return res.status(400).json({
                 success: false,
                 message: Object.values(err.errors).map((val) => val.message)[0],
             });
@@ -63,6 +75,7 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+    // loggerError.error('Testing error log');
     try {
         let user = null;
         if (req.body.userEmail) {
@@ -71,7 +84,10 @@ const loginUser = async (req, res) => {
             user = await Users.findOne({ userNumber: req.body.userNumber }).lean();
         }
         if (!user) {
+            loggerError.error('User authenticated failed', { userName: req.body.userName });
+
             return res.status(200).json({ message: "user not found", success: false });
+         
         }
 
         if (user.userSocialToken) {
@@ -88,23 +104,43 @@ const loginUser = async (req, res) => {
                 expiresIn: "7d",
             });
             user.userToken = token;
+            loggerInfo.info('User authenticated successfully', { userName: req.body.userName });
+
             return res
                 .status(200)
                 .json({ message: "login successfully", data: user, success: true });
+
         }
+
         return res.status(200).json({ message: "login failed", success: false });
-    } catch (err) {
+
+    }
+    
+    
+    catch (err) {
+        
+        loggerError.error('An error occurred', { error: err });
+
         console.log(err);
         if (err.name === "ValidationError") {
+
             console.error(Object.values(err.errors).map((val) => val.message));
+
+
             return res.status(400).json({
                 success: false,
                 message: Object.values(err.errors).map((val) => val.message)[0],
             });
+
         }
+
         return res.status(400).json({ success: false, message: err });
+
     }
+
 };
+
+
 
 const updateUser = async (req, res) => {
 
@@ -243,13 +279,24 @@ const updateUser = async (req, res) => {
                 new: true
             }
         );
+        if(!updateUser){
+            loggerError.error('User not update', { userName: req.body.userName });
 
-        res.status(200).json({
+            return res.status(400).json({
+                success:false,
+                message:"user not update"
+            })
+        }
+        loggerInfo.info('User update successfully', { userName: req.body.userName });
+
+       return res.status(200).json({
             success: true,
             data: updateUser,
             message: 'User saved successfully'
         });
     } catch (err) {
+        loggerError.error('An error occurred', { error: err });
+
         console.log(err);
         if (err.name === 'ValidationError') {
             console.error(
@@ -267,10 +314,23 @@ const updateUser = async (req, res) => {
 
 
 const getUserByUserID = async (req, res) => {
-    const user = await Users.findById(req.params.id);
+    const user = await Users.findById(req.params.id).select({
+
+        "userPassword":0,
+        "userCity":0,
+        "userTeam":0 ,
+        "userCoaches":0 ,
+        "userBio":0 ,
+        "userSchool":0,
+        "userSports":0    
+    });
     if (!user) {
+        loggerError.error('User not found', { userName: req.body.userName });
+
         return res.status(200).json({ message: "user not found", success: false });
     }
+
+    loggerInfo.info('User found successfully', { userName: req.body.userName });
 
     return res
         .status(200)
@@ -387,6 +447,8 @@ const followOrUnfollow = async (req, res) => {
                     success: false,
                 });
             }
+            loggerInfo.info('following', {userName:req.body.userName});
+
             return res.status(200).json({
                 message: "follow done",
                 success: true,
@@ -395,6 +457,8 @@ const followOrUnfollow = async (req, res) => {
             });
         }
     } catch (err) {
+        loggerError.error('An error occurred', { error: err });
+
         return res.status(400).json({ success: false, message: err });
     }
 };
@@ -403,10 +467,20 @@ const followOrUnfollow = async (req, res) => {
 const getUsersFans = async (req, res) => {
     try {
         const user = await Users.findById(req.user.user_id).populate(['userFollowers']);
+
+        if(!user){
+            loggerError.error('not found user fans', {userName:req.body.userName});
+
+        } 
+
+        loggerInfo.info('get user fans', {userName:req.body.userName});
+         
         return res
             .status(200)
             .json({ message: "success", success: true, data: user.userFollowers });
     } catch (err) {
+        loggerError.error('An error occurred', { error: err });
+
         return res.status(400).json({ success: false, message: err });
     }
 };
@@ -416,13 +490,23 @@ const getUserTeamMates = async (req, res) => {
     try {
         const user = await Users.findById(req.user.user_id).populate(['userFollowers', 'userFollowing']);
 
+        if(!user){
+            loggerError.error('not found user teammates', {userName:req.body.userName});
 
-
+            return res.status(400).json({
+                success:false,
+                message:"user not found"
+            })
+        }
         const commonObjects = user.userFollowers.filter(obj1 => user.userFollowing.some(obj2 => obj2.userName === obj1.userName));
+        loggerInfo.info('get user teammates', {userName:req.body.userName});
+
         return res
             .status(200)
             .json({ message: "success", success: true, data: commonObjects });
     } catch (err) {
+        loggerError.error('An error occurred', { error: err });
+
         return res.status(400).json({ success: false, message: err });
     }
 };

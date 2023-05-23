@@ -8,6 +8,8 @@ const ratingNewsFeedModel = require("../model/ratingnewsfeedModel");
 const shareNewsFeedModel = require("../model/shareNewsFeedModel");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 require("dotenv/config");
+const {loggerInfo,loggerError}  = require('../utils/log');
+
 
 const uploadOptions = multer({
   storage: multer.memoryStorage(),
@@ -51,12 +53,25 @@ const addNewsFeed = async (req, res) => {
       createdBy: user_id,
     });
 
-    res.status(200).json({
+     if(!newsFeed){
+      loggerError.error("newsfeed not create",{title:req.body.title})
+
+      return res.status(400).json({
+        success:false,
+        message:"newsfeed not found"
+      })
+     } 
+
+    loggerInfo.info("newsfeed create succesfully",{title:req.body.title})
+
+   return res.status(200).json({
       success: true,
       message: "News Feed Added Successfully",
       data: newsFeed,
     });
   } catch (error) {
+    loggerError.error('An error occurred', { error: error });
+
     console.log(error);
     res.status(500).json({
       success: false,
@@ -96,6 +111,17 @@ const updateNewsFeed = async (req, res) => {
       { new: true }
     );
 
+    if(!newsFeed){
+      loggerError.error("newsfeed not update",{title:req.body.title})
+
+      return res.status(400).json({
+        success:false,
+        message:"newsfeed not update"
+      })
+    }
+    loggerInfo.info("newsfeed update successfully",{title:req.body.title})
+
+
     res.status(200).json({
       success: true,
       message: "News Feed Updated Successfully",
@@ -103,6 +129,8 @@ const updateNewsFeed = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    loggerError.error('An error occurred', { error: error });
+
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -123,14 +151,28 @@ const deleteNewsFeed = async (req, res) => {
       },
       { new: true }
     );
+     
+    if(!newsFeed){
+  loggerError.error('newsfeed not delete');
 
-    res.status(200).json({
+      res.status(400).json({
+        success: fa,
+        message: "News Feed not Delete",
+        
+      });
+    }
+
+    loggerInfo.info('newsfeed delete');
+
+   return res.status(200).json({
       success: true,
       message: "News Feed Deleted Successfully",
       data: newsFeed,
     });
   } catch (error) {
     console.log(error);
+    loggerError.error('An error occurred', { error: error });
+
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -175,15 +217,25 @@ const getNewsFeed = async (req, res) => {
       // },
     ]);
 
+   if(!newsFeed){
+    loggerError.error("not fetch news feed");
 
+    return res.status(200).json({
+      success: false,
+      message: "News Feed not fetched"
+    });
+   }
 
-
-    res.status(200).json({
+     
+       loggerInfo.info("fetch news feed");
+    return res.status(200).json({
       success: true,
       message: "News Feed Fetched Successfully",
       data: newsFeed,
     });
   } catch (error) {
+    loggerError.error('An error occurred', { error: error });
+
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -211,12 +263,27 @@ const getNewsFeedById = async (req, res) => {
         model: "shareNewsFeed",
       }
     ]);/*  */
+
+
+    if(!newsFeed){
+      loggerError.error("not fetch news feed by id")
+
+      res.status(400).json({
+        success: false,
+        message: "News Feed Not Fetched",
+      
+      });
+    }
+
+    loggerInfo.info("fetch news feed by id")
     res.status(200).json({
       success: true,
       message: "News Feed Fetched Successfully",
       data: newsFeed,
     });
   } catch (error) {
+    loggerError.error('An error occurred', { error: error });
+
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -286,14 +353,26 @@ const shareNewsFeed = async (req, res) => {
       },
     ]);
 
+    if(!newsFeedShare){
+      loggerError.error("news feed not shared")
 
-    res.status(200).json({
+      return res.status(400).json({
+        success: false,
+        message: "News Feed not Shared",
+      
+      });
+    }
+
+    loggerInfo.info("news feed shared")
+   return res.status(200).json({
       success: true,
       message: "News Feed Shared Successfully",
       data: newsFeedShare,
     });
   } catch (error) {
     console.log(error);
+    loggerError.error('An error occurred', { error: error });
+
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -338,19 +417,26 @@ const likePost = async (req, res) => {
     );
 
     if (!pushLikeNewsFeed) {
+      loggerError.error("news feed not liked")
+
       return res.status(400).json({
         success: false,
         message: "News Feed Not Found",
       });
     }
 
-    res.status(200).json({
+
+    loggerInfo.info("news feed liked")
+
+    return res.status(200).json({
       success: true,
       message: "News Feed Liked Successfully",
       data: pushLikeNewsFeed,
     });
 
   } catch (error) {
+    loggerError.error('An error occurred', { error: error });
+
     console.log(error);
     res.status(500).json({
       success: false,
@@ -560,6 +646,8 @@ const ratingPost = async (req, res) => {
         {
           new: true,
         });
+
+
       return res.status(200).json({
         success: true,
         message: "News Feed rating updated successfully",
@@ -598,19 +686,26 @@ const ratingPost = async (req, res) => {
       { new: true }
     );
     if (!ratingNewsFeed) {
+      loggerError.error("news feed not rated")
+
       return res.status(400).json({
         success: false,
         message: "News Feed Not Found",
       });
     }
+ 
 
-    res.status(200).json({
+    loggerInfo.info("news feed rated")
+
+   return res.status(200).json({
       success: true,
       message: "News Feed rating Successfully",
       data: ratingNewsFeed,
     });
 
   } catch (error) {
+    loggerError.error('An error occurred', { error: error });
+
     res.status(500).json({
       success: false,
       message: "internal server error",
@@ -680,8 +775,9 @@ const getRatingAverage = async (req, res) => {
     //   console.log(userName);
     //   usernames.push(userName)
     // })
+    loggerInfo.info("avarage rated found")
 
-    res.status(200).json({
+   return res.status(200).json({
       success: true,
       message: "average rating found",
       data: {
@@ -691,6 +787,8 @@ const getRatingAverage = async (req, res) => {
     })
 
   } catch (error) {
+    loggerError.error('An error occurred', { error: error });
+
     console.log(error);
     res.status(500).json({
       success: false,

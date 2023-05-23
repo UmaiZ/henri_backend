@@ -6,7 +6,6 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const ChatRoomController = require("./controllers/chatServices");
-
 app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: true }));

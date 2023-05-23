@@ -7,6 +7,8 @@ const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 const { Users } = require("../model/user");
 const moment = require('moment');
 const newsFeedModel = require("../model/newsFeedModel");
+const {loggerInfo,loggerError}  = require('../utils/log');
+
 
 const uploadOptions = multer({
     storage: multer.memoryStorage(),
@@ -50,6 +52,14 @@ const createStatus = async (req, res) => {
       });
     //   console.log(status);
   
+    if(!status){
+      loggerError.error('status not created', { userName: req.body.userName });
+
+      return res.status(400).json({
+        success:false,
+        message:"status not create"
+      })
+    }
       // Highlight create
       const highlight = await Highlights.create({
         highlightText: text,
@@ -67,7 +77,8 @@ const createStatus = async (req, res) => {
           console.log('An error occurred while deleting the status:', error);
         }
       }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
-      
+      loggerInfo.info('status created succesfully', { userName: req.body.userName });
+
       res.status(200).json({
         success: true,
         message: "Status Added Successfully",
@@ -75,6 +86,8 @@ const createStatus = async (req, res) => {
       });
 
     } catch (error) {
+      loggerError.error('An error occurred', { error: error });
+
       console.log(error);
       res.status(500).json({
         success: false, 
@@ -92,17 +105,24 @@ const getStatus = async (req, res) => {
         const userStatus = await Status.find().populate('createdBy');
        
         if(!userStatus){
+          loggerError.error("status not found")
             return res.status(400).json({
                 success:false,
                 message:"status not found"
             })
         }
+
+        
+        loggerInfo.info("status found")
+
         return res.status(200).json({
             success:true,
             message:"status found successfully",
             data:userStatus
         })
     } catch (error) {
+      loggerError.error('An error occurred', { error: error });
+
         console.log(error);
         res.status(500).json({
             success: false,
