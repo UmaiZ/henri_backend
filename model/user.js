@@ -94,6 +94,7 @@ userschema.set("toJSON", {
     },
 });
 
-exports.Users = mongoose.model("users", userschema);
 
-exports.userschema = userschema;
+  const userModel = mongoose.model("users", userschema);
+
+  module.exports=userModel;

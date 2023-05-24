@@ -7,13 +7,14 @@ const auth = require("../middleware/auth");
 
 router.post("/register", limiter, userController.registerUser);
 router.post("/login", limiter, userController.loginUser);
-router.post("/updateUser", limiter, auth, userController.updateUser);
-router.get("/getUserByUserID/:id", limiter, userController.getUserByUserID);
+// router.put("/updateUser",auth,limiter, userController.updateUser);
+router.put("/updateUser", auth, limiter, userController.updateUser);
+router.get("/getUserByUserID/:id", userController.getUserByUserID);
 // router.post("/updateUser", limiter, auth, userController.updateUser);
 
 router.post("/followOrUnfollow", limiter, auth, userController.followOrUnfollow);
-router.get("/getUsersFans", limiter, auth, userController.getUsersFans);
-router.get("/getUserTeamMates", limiter, auth, userController.getUserTeamMates);
+router.get("/getUsersFans", auth, userController.getUsersFans);
+router.get("/getUserTeamMates", auth, userController.getUserTeamMates);
 
 
 

@@ -67,6 +67,8 @@ mongoose.connect(process.env.COLLECTION, {
   .catch(() => {
     console.log("database not connected");
   })
+
+
 const PORT = process.env.PORT || 6011;
 server.listen(PORT, (err) => {
   console.log(`App listening on port ${PORT}!`);
