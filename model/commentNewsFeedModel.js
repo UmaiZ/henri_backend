@@ -12,7 +12,7 @@ const commentNewsFeedSchema = new mongoose.Schema(
     },
     commentBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "users",
     },
   },
   { timestamps: true }

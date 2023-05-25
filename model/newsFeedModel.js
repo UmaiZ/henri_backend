@@ -4,7 +4,7 @@ const newsFeedSchema = new mongoose.Schema(
   {
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "users",
     },
     title: {
       type: String,

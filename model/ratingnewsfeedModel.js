@@ -8,7 +8,7 @@ const ratingNewsFeedSchema = new mongoose.Schema(
         },
         ratingBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "user",
+            ref: "users",
         },
         rating: {
             type: Number,

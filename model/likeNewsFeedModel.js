@@ -8,7 +8,7 @@ const likeNewsFeedSchema = new mongoose.Schema(
     },
     likedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "users",
     }
   },
   { timestamps: true }

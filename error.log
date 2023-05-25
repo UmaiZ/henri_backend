@@ -254,3 +254,14 @@
 {"level":"error","message":"User authenticated failed"}
 {"level":"error","message":"User not found"}
 {"error":"userModel.findById(...).populate is not a function","level":"error","message":"An error occurred"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"level":"error","message":"User authenticated failed"}

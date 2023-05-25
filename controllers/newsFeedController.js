@@ -8,7 +8,7 @@ const ratingNewsFeedModel = require("../model/ratingnewsfeedModel");
 const shareNewsFeedModel = require("../model/shareNewsFeedModel");
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 require("dotenv/config");
-const {loggerInfo,loggerError}  = require('../utils/log');
+const { loggerInfo, loggerError } = require('../utils/log');
 
 
 const uploadOptions = multer({
@@ -20,7 +20,7 @@ const uploadOptions = multer({
 
 const addNewsFeed = async (req, res) => {
   try {
-
+    console.log('hit');
     const { title, description } = req.body;
     const { files } = req;
     const { user_id } = req.user;
@@ -53,23 +53,25 @@ const addNewsFeed = async (req, res) => {
       createdBy: user_id,
     });
 
-     if(!newsFeed){
-      loggerError.error("newsfeed not create",{title:req.body.title})
+    if (!newsFeed) {
+      loggerError.error("newsfeed not create", { title: req.body.title })
 
       return res.status(400).json({
-        success:false,
-        message:"newsfeed not found"
+        success: false,
+        message: "newsfeed not found"
       })
-     } 
+    }
 
-    loggerInfo.info("newsfeed create succesfully",{title:req.body.title})
+    loggerInfo.info("newsfeed create succesfully", { title: req.body.title })
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "News Feed Added Successfully",
       data: newsFeed,
     });
   } catch (error) {
+    console.log(error);
+
     loggerError.error('An error occurred', { error: error });
 
     console.log(error);
@@ -111,15 +113,15 @@ const updateNewsFeed = async (req, res) => {
       { new: true }
     );
 
-    if(!newsFeed){
-      loggerError.error("newsfeed not update",{title:req.body.title})
+    if (!newsFeed) {
+      loggerError.error("newsfeed not update", { title: req.body.title })
 
       return res.status(400).json({
-        success:false,
-        message:"newsfeed not update"
+        success: false,
+        message: "newsfeed not update"
       })
     }
-    loggerInfo.info("newsfeed update successfully",{title:req.body.title})
+    loggerInfo.info("newsfeed update successfully", { title: req.body.title })
 
 
     res.status(200).json({
@@ -151,20 +153,20 @@ const deleteNewsFeed = async (req, res) => {
       },
       { new: true }
     );
-     
-    if(!newsFeed){
-  loggerError.error('newsfeed not delete');
+
+    if (!newsFeed) {
+      loggerError.error('newsfeed not delete');
 
       res.status(400).json({
         success: fa,
         message: "News Feed not Delete",
-        
+
       });
     }
 
     loggerInfo.info('newsfeed delete');
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "News Feed Deleted Successfully",
       data: newsFeed,
@@ -217,17 +219,17 @@ const getNewsFeed = async (req, res) => {
       // },
     ]);
 
-   if(!newsFeed){
-    loggerError.error("not fetch news feed");
+    if (!newsFeed) {
+      loggerError.error("not fetch news feed");
 
-    return res.status(200).json({
-      success: false,
-      message: "News Feed not fetched"
-    });
-   }
+      return res.status(200).json({
+        success: false,
+        message: "News Feed not fetched"
+      });
+    }
 
-     
-       loggerInfo.info("fetch news feed");
+
+    loggerInfo.info("fetch news feed");
     return res.status(200).json({
       success: true,
       message: "News Feed Fetched Successfully",
@@ -265,13 +267,13 @@ const getNewsFeedById = async (req, res) => {
     ]);/*  */
 
 
-    if(!newsFeed){
+    if (!newsFeed) {
       loggerError.error("not fetch news feed by id")
 
       res.status(400).json({
         success: false,
         message: "News Feed Not Fetched",
-      
+
       });
     }
 
@@ -353,18 +355,18 @@ const shareNewsFeed = async (req, res) => {
       },
     ]);
 
-    if(!newsFeedShare){
+    if (!newsFeedShare) {
       loggerError.error("news feed not shared")
 
       return res.status(400).json({
         success: false,
         message: "News Feed not Shared",
-      
+
       });
     }
 
     loggerInfo.info("news feed shared")
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "News Feed Shared Successfully",
       data: newsFeedShare,
@@ -693,11 +695,11 @@ const ratingPost = async (req, res) => {
         message: "News Feed Not Found",
       });
     }
- 
+
 
     loggerInfo.info("news feed rated")
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "News Feed rating Successfully",
       data: ratingNewsFeed,
@@ -777,7 +779,7 @@ const getRatingAverage = async (req, res) => {
     // })
     loggerInfo.info("avarage rated found")
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "average rating found",
       data: {

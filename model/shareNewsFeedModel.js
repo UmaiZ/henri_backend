@@ -8,7 +8,7 @@ const shareNewsFeedSchema = new mongoose.Schema(
     },
     sharedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "users",
     }
   },
   { timestamps: true }

@@ -76,13 +76,15 @@ const getChatRooms = async (req, res) => {
             users: { $in: [user_id] },
             type: "PRIVATE",
         }).populate({
-            path: "messages",
-            options: { sort: { createdAt: -1 }, limit: 1 },
+            path: "users",
         });
         // Remove Item if no messages
         const chatRoomsWithMessages = chatRooms.filter(
             (chatRoom) => chatRoom.messages.length > 0
         );
+        for (let i = chatRoomsWithMessages.length - 1; i >= 0; i--) {
+            chatRoomsWithMessages[i].users = chatRoomsWithMessages[i].users.filter(item => item._id.toString() !== user_id);
+        }
         // const token =
         //   req.body.token || req.query.token || req.headers["x-access-token"];
         // const config = {
