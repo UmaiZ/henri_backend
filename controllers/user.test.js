@@ -3,9 +3,11 @@ const app = require("../index");
 const userModel = require("../model/user");
 const bcrypt = require("bcryptjs");
 const { getUserTeamMates } = require('../controllers/user');
-// const {getUsersFans}=require('../controllers/user')
-// const { loggerError, loggerInfo } = require('../utils/log'); // Replace the path with the actual path to your logger file
+// const {getUsersFans}=require('../controllers/user');
+const controller = require('../controllers/user');
 
+// const { loggerError, loggerInfo } = require('../utils/log'); // Replace the path with the actual path to your logger file
+const { findById } = require('../model/user');
 
 //user register test case
 
@@ -229,6 +231,37 @@ describe("GET /getUserTeamMates", () => {
 });
 
 
+//get user fans test case
 
+jest.mock('../model/user');
+
+describe('GET /getUsersFans', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('should handle internal server error', async () => {
+    const req = {
+      user: { user_id: '646f91eb1ddeed0f7cf1bb57' },
+    };
+
+    const errorMessage = 'An unexpected error occurred';
+
+    userModel.findById.mockRejectedValue(new Error(errorMessage));
+
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    await controller.getUsersFans(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: 'Internal server error',
+    });
+  });
+});
 
 

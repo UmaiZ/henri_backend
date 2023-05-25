@@ -213,3 +213,44 @@
 {"error":"Internal server error","level":"error","message":"An error occurred"}
 {"level":"error","message":"User authenticated failed"}
 {"level":"error","message":"User not found"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User not found"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User not found"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User not found"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"level":"error","message":"User not found"}
+{"error":"Cannot read properties of undefined (reading 'userName')","level":"error","message":"An error occurred"}
+{"error":"Cannot read properties of undefined (reading 'userName')","level":"error","message":"An error occurred"}
+{"error":"Database connection error","level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"level":"error","message":"User not found"}
+{"error":"userModel.findById(...).populate is not a function","level":"error","message":"An error occurred"}
+{"level":"error","message":"not found user fans"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"level":"error","message":"User not found"}
+{"error":"userModel.findById(...).populate is not a function","level":"error","message":"An error occurred"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User not found"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"error":{},"level":"error","message":"An error occurred"}
+{"level":"error","message":"User not found"}
+{"error":"userModel.findById(...).populate is not a function","level":"error","message":"An error occurred"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User not found"}
+{"error":"userModel.findById(...).populate is not a function","level":"error","message":"An error occurred"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User authenticated failed"}
+{"level":"error","message":"User not found"}
+{"error":"userModel.findById(...).populate is not a function","level":"error","message":"An error occurred"}

@@ -81,9 +81,11 @@ const loginUser = async (req, res) => {
     try {
         let user = null;
         if (req.body.userEmail) {
-            user = await userModel.findOne({ userEmail: req.body.userEmail }).lean();
+            user = await userModel.findOne({ userEmail: req.body.userEmail })
+            // .lean();
         } else {
-            user = await userModel.findOne({ userNumber: req.body.userNumber }).lean();
+            user = await userModel.findOne({ userNumber: req.body.userNumber })
+            // .lean();
         }
         if (!user) {
             loggerError.error('User authenticated failed', { userName: req.body.userName });
@@ -413,32 +415,6 @@ const getUsersFans = async (req, res) => {
   };
   
   
-
-
-// const getUserTeamMates = async (req, res) => {
-//     try {
-//         const user = await userModel.findById(req.user.user_id).populate(['userFollowers', 'userFollowing']);
-
-//         if(!user){
-//             loggerError.error('not found user teammates', {userName:req.body.userName});
-
-//             return res.status(400).json({
-//                 success:false,
-//                 message:"user not found"
-//             })
-//         }
-//         const commonObjects = user.userFollowers.filter(obj1 => user.userFollowing.some(obj2 => obj2.userName === obj1.userName));
-//         loggerInfo.info('get user teammates', {userName:req.body.userName});
-
-//         return res
-//             .status(200)
-//             .json({ message: "success", success: true, data: commonObjects });
-//     } catch (err) {
-//         loggerError.error('An error occurred', { error: err });
-
-//         return res.status(400).json({ success: false, message: err });
-//     }
-// };
 
 const getUserTeamMates = async (req, res) => {
     try {
