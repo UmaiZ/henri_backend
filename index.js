@@ -6,6 +6,7 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const ChatRoomController = require("./controllers/chatServices");
+// const generateAgoraToken = require('./utils/agoraTokenGenerate');
 app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,7 +14,7 @@ app.use(bodyParser.json());
 
 app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 
-require("dotenv/config");
+// require('dotenv').config();
 const newsFeedRouter = require("./routes/newsFeedRouter");
 const userRouter = require("./routes/user");
 const statusRouter = require("./routes/statusRouter");
@@ -25,6 +26,30 @@ app.use(chatRoomRouter);
 app.use(newsFeedRouter);
 app.use(userRouter);
 app.use(statusRouter);
+
+// app.get('/generate-token', (req, res) => {
+//   const appId = process.env.APP_ID;
+//   const appCertificate = process.env.APP_CERTIFICATE;
+//   const channelName = req.query.channelName;
+//   const uid = req.query.uid || Math.floor(Math.random() * 100000);
+//   const role = req.query.role || "publisher";
+//   if (!appId || !appCertificate) {
+//     return res.status(400).json({ error: "Missing required parameters" });
+//   }
+
+//   // Additional validation for channel name and role
+//   if (!channelName || typeof channelName !== "string") {
+//     return res.status(400).json({ error: "required channel name" });
+//   }
+
+//   if (role !== "publisher" && role !== "subscriber") {
+//     return res.status(400).json({ error: "Invalid role" });
+//   }
+//   const agoraToken = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
+
+//   res.json({ token: agoraToken });
+// });
+
 
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "Server Running" });
