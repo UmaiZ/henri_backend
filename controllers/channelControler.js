@@ -39,7 +39,6 @@ const agoraTokenGenerate = async (req, res) => {
       if (!user) {
         // User not found, create a new one
         const newUser = new channelModel({
-          _id: user_id,
           channelName,
           uid: uid.toString(),
           token: agoraToken // Save the token field in the model
