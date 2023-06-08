@@ -15,7 +15,6 @@ router.get("/getUserByUserID/:id", userController.getUserByUserID);
 router.post("/followOrUnfollow", limiter, auth, userController.followOrUnfollow);
 router.get("/getUsersFans", auth, userController.getUsersFans);
 router.get("/getUserTeamMates", auth, userController.getUserTeamMates);
-router.get("/generate-token",userController.agoraTokenGenerate)
 
 
 module.exports = router;

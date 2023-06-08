@@ -8,7 +8,7 @@ const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 const { loggerInfo, loggerError } = require('../utils/log');
 require('dotenv').config();
 
-const generateAgoraToken = require('../utils/agoraTokenGenerate');
+const channelModel = require("../model/channelModel");
 // var loggerError=require("../utils/log");
 
 
@@ -145,7 +145,6 @@ const loginUser = async (req, res) => {
   }
 
 };
-
 
 
 
@@ -449,35 +448,9 @@ const getUserTeamMates = async (req, res) => {
   }
 };
 
-const agoraTokenGenerate=async(req,res)=>{
-  try {
-    const appId = process.env.APP_ID;
-  const appCertificate = process.env.APP_CERTIFICATE;
-  const channelName = req.query.channelName;
-  const uid = req.query.uid || Math.floor(Math.random() * 100000);
-  const role = req.query.role || "publisher";
-  if (!appId || !appCertificate) {
-    return res.status(400).json({ error: "Missing required parameters" });
-  }
 
-  // Additional validation for channel name and role
-  if (!channelName || typeof channelName !== "string") {
-    return res.status(400).json({ error: "required channel name" });
-  }
 
-  if (role !== "publisher" && role !== "subscriber") {
-    return res.status(400).json({ error: "Invalid role" });
-  }
-  const agoraToken = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
 
-  res.json({ token: agoraToken });
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-  }
-}
 
 module.exports = {
   registerUser,
@@ -491,5 +464,4 @@ module.exports = {
   }, {
     name: 'coverimage', maxCount: 1
   }]), updateUser],
-agoraTokenGenerate
 };

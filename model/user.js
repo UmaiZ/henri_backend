@@ -80,6 +80,10 @@ const userschema = new mongoose.Schema({
             ref: "users",
         },
     ],
+    // channel:{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "channels",
+    // }
 
 });
 userschema.virtual("userID").get(function () {
