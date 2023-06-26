@@ -1,7 +1,8 @@
 const channelModel =require('../model/channelModel');
 const generateAgoraToken =require('../utils/agoraTokenGenerate');
+const userModel=require('../model/user');
 
-
+//agora token generate by user id
 const agoraTokenGenerate = async (req, res) => {
     try {
       const { user_id } = req.user;
@@ -60,5 +61,43 @@ const agoraTokenGenerate = async (req, res) => {
       });
     }
   };
+
+
+
+
+
+//create chat room
+
+const createChatRoomForCalling=async(req,res)=>{
+try {
+  
+  const {user_id}=req.user;
+
+  const {channelName,token,role}=req.body;
+
+ const user=await userModel.findById(user_id);
+
+ if(!user){
+  return res.status(400).json({
+    success:false,
+    message:"user not found"
+  })
+ }
+
+ //creata chat room
+ 
+
+
+
+
+
+} catch (error) {
+  res.status(500).json({
+    success:false,
+    message:"internal server error",
+    error:error.message
+  })
+}
+}
   
   module.exports={agoraTokenGenerate}
