@@ -1,6 +1,8 @@
-const channelModel =require('../model/channelModel');
+const {channelModel} =require('../model/channelModel');
 const generateAgoraToken =require('../utils/agoraTokenGenerate');
 const userModel=require('../model/user');
+const {channelRoomModel} = require('../model/channelModel');
+const { test } = require('node:test');
 
 //agora token generate by user id
 const agoraTokenGenerate = async (req, res) => {
@@ -68,36 +70,141 @@ const agoraTokenGenerate = async (req, res) => {
 
 //create chat room
 
-const createChatRoomForCalling=async(req,res)=>{
-try {
-  
-  const {user_id}=req.user;
+const createChannelRoom = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const uid = user_id;
+    const { channelName, role, createdBy, date,channelRoomName  } = req.body;
+    const appId = process.env.APP_ID;
+    const appCertificate = process.env.APP_CERTIFICATE;
+    const user = await userModel.findById(user_id);
 
-  const {channelName,token,role}=req.body;
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
- const user=await userModel.findById(user_id);
+    // Generate Agora token
+    const token = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
 
- if(!user){
-  return res.status(400).json({
-    success:false,
-    message:"user not found"
-  })
- }
+    // Create channel room
+    const channelRoom = new channelRoomModel({
+      token,
+      channelName,
+      createdBy,
+      date,
+      channelRoomName
+    });
 
- //creata chat room
- 
+    const savedChannelRoom = await channelRoom.save();
+
+    // Create a new channel and assign it to channel room
+    const channel = new channelModel({
+      channelName,
+      uid: user_id,
+      role,
+      channelRoom: savedChannelRoom._id
+    });
+
+    const savedChannel = await channel.save();
+
+    // Update the channelRoom with the associated channel
+    savedChannelRoom.channel = savedChannel._id;
+    await savedChannelRoom.save();
+
+    return res.status(201).json(savedChannelRoom);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};
 
 
+const getChannelRoom=async(req,res)=>{
+  try {
+    const {user_id}=req.user;
 
+    const user=await userModel.findById(user_id);
 
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:"user not found"
+      })
+    } 
 
-} catch (error) {
-  res.status(500).json({
-    success:false,
-    message:"internal server error",
-    error:error.message
-  })
+    //find channel room
+
+    const findRoom=await channelRoomModel.find().populate(['createdBy','channel']);
+
+    if(!findRoom){
+      return res.status(400).json({
+        success:false,
+        message:"channel room not found"
+      })
+    }
+
+    return res.status(200).json({
+      success:true,
+      message:"channel room found successfully",
+      data:findRoom
+    })
+  }  catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
 }
-}
   
-  module.exports={agoraTokenGenerate}
+const deleteChannelRoom=async(req,res)=>{
+  try {
+    const {user_id}=req.user;
+    const {channelId}=req.params;
+    const userfind=await userModel.findById(user_id);
+
+    if(!userfind){
+      return res.status(400).json({
+        success:false,
+        message:"user not found"
+      })
+    }
+    
+    // const channel=await channelId.fin
+    //delete channel room
+
+    const deletechannelroom=await channelRoomModel.findByIdAndDelete(channelId);
+
+    if(!deletechannelroom){
+      return res.status(400).json({
+        success:false,
+        message:"channel room id not found"
+      })
+    }
+
+
+    //delete channel room id in channel model
+
+    await channelModel.deleteMany({ _id: { $in: deletechannelroom.channel } });
+    return res.status(200).json({
+      success:true,
+      message:"channel room delete successfully"
+    })
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+}
+
+
+  module.exports={agoraTokenGenerate,createChannelRoom,getChannelRoom,deleteChannelRoom}
