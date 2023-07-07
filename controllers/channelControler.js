@@ -55,7 +55,9 @@ const agoraTokenGenerate = async (req, res) => {
       await user.save();
     }
 
-    res.json({ token: agoraToken });
+    res.json({
+      token: agoraToken, channelName: channelName,
+    });
   } catch (error) {
     return res.status(400).json({
       success: false,
