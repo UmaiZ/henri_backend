@@ -1,68 +1,68 @@
-const {channelModel} =require('../model/channelModel');
-const generateAgoraToken =require('../utils/agoraTokenGenerate');
-const userModel=require('../model/user');
-const {channelRoomModel} = require('../model/channelModel');
+const { channelModel } = require('../model/channelModel');
+const generateAgoraToken = require('../utils/agoraTokenGenerate');
+const userModel = require('../model/user');
+const { channelRoomModel } = require('../model/channelModel');
 const { test } = require('node:test');
 
 //agora token generate by user id
 const agoraTokenGenerate = async (req, res) => {
-    try {
-      const { user_id } = req.user;
-      console.log(user_id);
-      const appId = process.env.APP_ID;
-      const appCertificate = process.env.APP_CERTIFICATE;
-      const channelName = req.query.channelName;
-  
-      // Validate user ID
-      if (!user_id) {
-        return res.status(400).json({ error: "User ID is not valid" });
-      }
-  
-      const uid = user_id;
-      const role = req.query.role || "publisher";
-  
-      if (!appId || !appCertificate) {
-        return res.status(400).json({ error: "Missing required parameters" });
-      }
-  
-      // Additional validation for channel name and role
-      if (!channelName || typeof channelName !== "string") {
-        return res.status(400).json({ error: "Required channel name" });
-      }
-  
-      if (role !== "publisher" && role !== "subscriber") {
-        return res.status(400).json({ error: "Invalid role" });
-      }
-  
-      const agoraToken = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
-  
-      
-      // Save user info, channel name, and ID to MongoDB
-      const user = await channelModel.findById(user_id);
-      if (!user) {
-        // User not found, create a new one
-        const newUser = new channelModel({
-          channelName,
-          uid: uid.toString(),
-          token: agoraToken // Save the token field in the model
-        });
-        await newUser.save();
-      } else {
-        // Update existing user
-        user.channelName = channelName;
-        user.uid = uid.toString();
-        user.token = agoraToken; // Update the token field in the model
-        await user.save();
-      }
-  
-      res.json({ token: agoraToken });
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
+  try {
+    const { user_id } = req.user;
+    console.log(user_id);
+    const appId = process.env.APP_ID;
+    const appCertificate = process.env.APP_CERTIFICATE;
+    const channelName = req.query.channelName;
+
+    // Validate user ID
+    if (!user_id) {
+      return res.status(400).json({ error: "User ID is not valid" });
     }
-  };
+
+    const uid = user_id;
+    const role = req.query.role || "publisher";
+
+    if (!appId || !appCertificate) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    // Additional validation for channel name and role
+    if (!channelName || typeof channelName !== "string") {
+      return res.status(400).json({ error: "Required channel name" });
+    }
+
+    if (role !== "publisher" && role !== "subscriber") {
+      return res.status(400).json({ error: "Invalid role" });
+    }
+
+    const agoraToken = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
+
+
+    // Save user info, channel name, and ID to MongoDB
+    const user = await channelModel.findById(user_id);
+    if (!user) {
+      // User not found, create a new one
+      const newUser = new channelModel({
+        channelName: channelName,
+        uid: uid.toString(),
+        token: agoraToken // Save the token field in the model
+      });
+      await newUser.save();
+    } else {
+      // Update existing user
+      user.channelName = channelName;
+      user.uid = uid.toString();
+      user.token = agoraToken; // Update the token field in the model
+      await user.save();
+    }
+
+    res.json({ token: agoraToken });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 
 
@@ -74,7 +74,7 @@ const createChannelRoom = async (req, res) => {
   try {
     const { user_id } = req.user;
     const uid = user_id;
-    const { channelName, role, createdBy, date,channelRoomName  } = req.body;
+    const { channelName, role, createdBy, date, channelRoomName } = req.body;
     const appId = process.env.APP_ID;
     const appCertificate = process.env.APP_CERTIFICATE;
     const user = await userModel.findById(user_id);
@@ -125,36 +125,36 @@ const createChannelRoom = async (req, res) => {
 };
 
 
-const getChannelRoom=async(req,res)=>{
+const getChannelRoom = async (req, res) => {
   try {
-    const {user_id}=req.user;
+    const { user_id } = req.user;
 
-    const user=await userModel.findById(user_id);
+    const user = await userModel.findById(user_id);
 
-    if(!user){
+    if (!user) {
       return res.status(400).json({
-        success:false,
-        message:"user not found"
+        success: false,
+        message: "user not found"
       })
-    } 
+    }
 
     //find channel room
 
-    const findRoom=await channelRoomModel.find().populate(['createdBy','channel']);
+    const findRoom = await channelRoomModel.find().populate(['createdBy', 'channel']);
 
-    if(!findRoom){
+    if (!findRoom) {
       return res.status(400).json({
-        success:false,
-        message:"channel room not found"
+        success: false,
+        message: "channel room not found"
       })
     }
 
     return res.status(200).json({
-      success:true,
-      message:"channel room found successfully",
-      data:findRoom
+      success: true,
+      message: "channel room found successfully",
+      data: findRoom
     })
-  }  catch (error) {
+  } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -162,29 +162,29 @@ const getChannelRoom=async(req,res)=>{
     });
   }
 }
-  
-const deleteChannelRoom=async(req,res)=>{
-  try {
-    const {user_id}=req.user;
-    const {channelId}=req.params;
-    const userfind=await userModel.findById(user_id);
 
-    if(!userfind){
+const deleteChannelRoom = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const { channelId } = req.params;
+    const userfind = await userModel.findById(user_id);
+
+    if (!userfind) {
       return res.status(400).json({
-        success:false,
-        message:"user not found"
+        success: false,
+        message: "user not found"
       })
     }
-    
+
     // const channel=await channelId.fin
     //delete channel room
 
-    const deletechannelroom=await channelRoomModel.findByIdAndDelete(channelId);
+    const deletechannelroom = await channelRoomModel.findByIdAndDelete(channelId);
 
-    if(!deletechannelroom){
+    if (!deletechannelroom) {
       return res.status(400).json({
-        success:false,
-        message:"channel room id not found"
+        success: false,
+        message: "channel room id not found"
       })
     }
 
@@ -193,10 +193,10 @@ const deleteChannelRoom=async(req,res)=>{
 
     await channelModel.deleteMany({ _id: { $in: deletechannelroom.channel } });
     return res.status(200).json({
-      success:true,
-      message:"channel room delete successfully"
+      success: true,
+      message: "channel room delete successfully"
     })
-    
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -207,4 +207,4 @@ const deleteChannelRoom=async(req,res)=>{
 }
 
 
-  module.exports={agoraTokenGenerate,createChannelRoom,getChannelRoom,deleteChannelRoom}
+module.exports = { agoraTokenGenerate, createChannelRoom, getChannelRoom, deleteChannelRoom }
