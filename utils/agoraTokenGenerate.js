@@ -16,9 +16,9 @@ function generateAgoraToken(appId, appCertificate, channelName, uid, role) {
   );
 
   // Sign the token using JWT
-  const agoraToken = jwt.sign(token, appCertificate);
-  
-  return agoraToken;
+  // const agoraToken = jwt.sign(token, appCertificate);
+
+  return token;
 }
 
 module.exports = generateAgoraToken;

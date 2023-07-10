@@ -393,3 +393,6 @@
 {"level":"info","message":"User authenticated successfully"}
 {"level":"info","message":"User register successfully","userName":"chamber"}
 {"level":"info","message":"User authenticated successfully"}
+{"level":"info","message":"User authenticated successfully"}
+{"level":"info","message":"fetch news feed"}
+{"level":"info","message":"status found"}
