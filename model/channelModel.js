@@ -1,36 +1,33 @@
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 
-const channelSchema=new mongoose.Schema({
-
-     channelName: {
-        type: String,
-      },
-      uid: {
-        type: String,
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"users"
-      },
-      role: {
-        type: String,
-        enum: ['publisher', 'subscriber'],
-        default: 'publisher',
-      },
-      token:{
-        type:String
-      },
-      channelRoom:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"channelrooms"
-      }
-
+const channelSchema = new mongoose.Schema({
+  channelName: {
+    type: String,
+  },
+  uid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users"
+  },
+  // role: {
+  //   type: String,
+  //   enum: ['publisher', 'subscriber'],
+  //   default: 'publisher',
+  // },
+  token: {
+    type: String
+  },
+  // channelRoom:{
+  //   type:mongoose.Schema.Types.ObjectId,
+  //   ref:"channelrooms"
+  // }
 });
 
 
-const channelModel=mongoose.model('channels',channelSchema);
+const channelModel = mongoose.model('channels', channelSchema);
 
 
 const channelRoomSchema = new mongoose.Schema({
-  channelRoomName:{
+  channelRoomName: {
     type: String,
     // required: true
   },
@@ -63,7 +60,7 @@ const channelRoomModel = mongoose.model('channelrooms', channelRoomSchema);
 // module.exports=channelModel;
 // module.exports=channelRoomModel;
 
-module.exports={
+module.exports = {
   channelModel,
   channelRoomModel
 }

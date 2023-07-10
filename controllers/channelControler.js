@@ -72,66 +72,70 @@ const agoraTokenGenerate = async (req, res) => {
 
 //create chat room
 
-const createChannelRoom = async (req, res) => {
-  try {
-    const { user_id } = req.user;
-    const uid = user_id;
-    const { channelName, role, createdBy, date, channelRoomName } = req.body;
-    const appId = process.env.APP_ID;
-    const appCertificate = process.env.APP_CERTIFICATE;
-    const user = await userModel.findById(user_id);
+// const createChannelRoom = async (req, res) => {
+//   try {
+//     const { user_id } = req.user;
+//     const uid = user_id;
+//     const { channelName, role, createdBy, date, channelRoomName } = req.body;
+//     const appId = process.env.APP_ID;
+//     const appCertificate = process.env.APP_CERTIFICATE;
+//     const user = await userModel.findById(user_id);
 
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found"
-      });
-    }
+//     if (!user) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "User not found"
+//       });
+//     }
 
-    // Generate Agora token
-    const token = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
+//     // Generate Agora token
+//     const token = generateAgoraToken(appId, appCertificate, channelName, uid.toString(), role);
 
-    // Create channel room
-    const channelRoom = new channelRoomModel({
-      token,
-      channelName,
-      createdBy,
-      date,
-      channelRoomName
-    });
+//     // Create channel room
+//     const channelRoom = new channelRoomModel({
+//       token,
+//       channelName,
+//       createdBy,
+//       date,
+//       channelRoomName
+//     });
 
-    const savedChannelRoom = await channelRoom.save();
+//     const savedChannelRoom = await channelRoom.save();
 
-    // Create a new channel and assign it to channel room
-    const channel = new channelModel({
-      channelName,
-      uid: user_id,
-      role,
-      channelRoom: savedChannelRoom._id
-    });
+//     // Create a new channel and assign it to channel room
+//     const channel = new channelModel({
+//       channelName,
+//       uid: user_id,
+//       role,
+//       channelRoom: savedChannelRoom._id
+//     });
 
-    const savedChannel = await channel.save();
+//     const savedChannel = await channel.save();
 
-    // Update the channelRoom with the associated channel
-    savedChannelRoom.channel = savedChannel._id;
-    await savedChannelRoom.save();
+//     // Update the channelRoom with the associated channel
+//     savedChannelRoom.channel = savedChannel._id;
+//     await savedChannelRoom.save();
 
-    return res.status(201).json(savedChannelRoom);
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message
-    });
-  }
-};
+//     return res.status(201).json(savedChannelRoom);
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message
+//     });
+//   }
+// };
 
 
 const getChannelRoom = async (req, res) => {
   try {
     const { user_id } = req.user;
 
-    const user = await userModel.findById(user_id);
+    const user = await channelModel.find({ "channelName": user_id }).populate({
+      'path': 'uid',
+      select: { 'userName': 1, 'userEmail': 1, 'userImage': 1, 'userID': 1 }
+
+    });
 
     if (!user) {
       return res.status(400).json({
@@ -141,20 +145,18 @@ const getChannelRoom = async (req, res) => {
     }
 
     //find channel room
-
-    const findRoom = await channelRoomModel.find().populate(['createdBy', 'channel']);
-
-    if (!findRoom) {
-      return res.status(400).json({
-        success: false,
-        message: "channel room not found"
-      })
-    }
+    // const findRoom = await channelRoomModel.find().populate(['createdBy', 'channel']);
+    // if (!findRoom) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "channel room not found"
+    //   })
+    // }
 
     return res.status(200).json({
       success: true,
       message: "channel room found successfully",
-      data: findRoom
+      data: user
     })
   } catch (error) {
     return res.status(500).json({
@@ -209,4 +211,4 @@ const deleteChannelRoom = async (req, res) => {
 }
 
 
-module.exports = { agoraTokenGenerate, createChannelRoom, getChannelRoom, deleteChannelRoom }
+module.exports = { agoraTokenGenerate, getChannelRoom, deleteChannelRoom }
