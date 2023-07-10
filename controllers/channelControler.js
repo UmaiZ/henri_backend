@@ -131,7 +131,7 @@ const getChannelRoom = async (req, res) => {
   try {
     const { user_id } = req.user;
 
-    const user = await channelModel.find({ "channelName": user_id }).populate({
+    const user = await channelModel.find().populate({
       'path': 'uid',
       select: { 'userName': 1, 'userEmail': 1, 'userImage': 1, 'userID': 1 }
 
