@@ -581,26 +581,31 @@ const deleteCommentNewsFeed = async (req, res) => {
 };
 
 const getCommentsOfFeed = async (req, res) => {
+
   try {
     const { user_id } = req.user;
-    const newsFeed = await commentNewsFeedModel.find({ commentBy: user_id })
+    const { newsFeedId } = req.params;
+
+    const newsFeed = await newsFeedModel.findById(newsFeedId).populate([
+
+      {
+        path: "comment",
+        model: "commentNewsFeed",
+        populate: {
+          path: 'commentBy',
+        }
+
+      },
+
+    ]);/*  */
 
 
-
-      .populate([
-
-        {
-          path: "commentBy",
-          model: "users",
-        },
-
-      ]);
 
 
     res.status(200).json({
       success: true,
       message: "Comments of  News Feed Fetched Successfully",
-      data: newsFeed,
+      data: newsFeed.comment,
     });
   } catch (error) {
     res.status(500).json({
