@@ -156,11 +156,9 @@ const deleteNewsFeed = async (req, res) => {
 
     if (!newsFeed) {
       loggerError.error('newsfeed not delete');
-
       res.status(400).json({
-        success: fa,
+        success: false,
         message: "News Feed not Delete",
-
       });
     }
 

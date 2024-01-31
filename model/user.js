@@ -64,6 +64,26 @@ const userschema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    userBio: {
+        type: String,
+        default: "",
+    },
+    userSpeed: {
+        type: String,
+        default: "",
+    },
+    userHeight: {
+        type: String,
+        default: "",
+    },
+    userWeight: {
+        type: String,
+        default: "",
+    },
+    userGpa: {
+        type: String,
+        default: "",
+    },
     userSports: {
         type: String,
         default: "",

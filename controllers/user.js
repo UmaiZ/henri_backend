@@ -200,6 +200,10 @@ const updateUser = async (req, res) => {
         userCoaches: req.body.userCoaches,
         userBio: req.body.userBio,
         userSports: req.body.userSports,
+        userSpeed: req.body.userSpeed,
+        userHeight: req.body.userHeight,
+        userWeight: req.body.userWeight,
+        userGpa: req.body.userGpa,
         userImage: imageLocation,
         userCover: coverImageLocation
       },
