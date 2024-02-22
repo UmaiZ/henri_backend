@@ -30,7 +30,7 @@ app.use(channelRouter);
 
 
 app.get("/", (req, res) => {
-  res.status(200).json({ success: true, message: "Server Running" });
+  res.status(200).json({ success: true, message: "Server Running v1" });
 });
 // app.use(responseHandler);
 
