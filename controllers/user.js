@@ -242,6 +242,75 @@ const updateUser = async (req, res) => {
   }
 };
 
+const updateUserProfile = async (req, res) => {
+  console.log('hit');
+  if (req.body.userName) {
+    const usercheck = await userModel.find({ userName: req.body.userName });
+    if (usercheck.length !== 0) {
+      return res
+        .status(400)
+        .json({ message: 'User name already exists', success: false });
+    }
+  }
+
+  try {
+
+
+    const updateUser = await userModel.findByIdAndUpdate(
+      req.user.user_id,
+      {
+        userEmail: req.body.userEmail,
+        userName: req.body.userName,
+        userCity: req.body.userCity,
+        userAddress: req.body.userAddress,
+        userCountry: req.body.userCountry,
+        userNumber: req.body.userNumber,
+        userSchool: req.body.userSchool,
+        userTeam: req.body.userTeam,
+        userCoaches: req.body.userCoaches,
+        userBio: req.body.userBio,
+        userSports: req.body.userSports,
+        userSpeed: req.body.userSpeed,
+        userHeight: req.body.userHeight,
+        userWeight: req.body.userWeight,
+        userGpa: req.body.userGpa,
+      },
+      {
+        new: true
+      }
+    );
+
+    if (!updateUser) {
+      loggerError.error('User not updated', { userName: req.body.userName });
+      return res.status(404).json({
+        success: false,
+        message: 'User not found or not updated'
+      });
+    }
+
+    loggerInfo.info('User updated successfully', { userName: req.body.userName });
+
+    return res.status(200).json({
+      success: true,
+      data: updateUser,
+      message: 'User saved successfully'
+    });
+  } catch (err) {
+    loggerError.error('An error occurred', { error: err });
+
+    console.log(err);
+    if (err.name === 'ValidationError') {
+      console.error(Object.values(err.errors).map((val) => val.message));
+      return res.status(400).json({
+        success: false,
+        message: Object.values(err.errors).map((val) => val.message)[0]
+      });
+    }
+    return res.status(500).json({ success: false, message: err });
+  }
+};
+
+
 
 const getUserByUserID = async (req, res) => {
   const user = await userModel.findById(req.params.id)
@@ -463,6 +532,7 @@ module.exports = {
   followOrUnfollow,
   getUserTeamMates,
   getUsersFans,
+  updateUserProfile,
   updateUser: [uploadOptions.fields([{
     name: 'image', maxCount: 1
   }, {

@@ -9,6 +9,10 @@ router.post("/register", limiter, userController.registerUser);
 router.post("/login", limiter, userController.loginUser);
 // router.put("/updateUser",auth,limiter, userController.updateUser);
 router.post("/updateUser", auth, limiter, userController.updateUser);
+router.post("/updateUserProfile", auth, limiter, userController.updateUserProfile);
+
+
+
 router.get("/getUserByUserID/:id", userController.getUserByUserID);
 // router.post("/updateUser", limiter, auth, userController.updateUser);
 
