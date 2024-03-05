@@ -64,16 +64,17 @@ console.log(process.env.DB_NAME);
 
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.COLLECTION, {
-  dbName: process.env.DB_NAME,
   useNewUrlParser: true,
   useUnifiedTopology: true,
+
+}).then(() => {
+  console.log("database connected");
 })
-  .then(() => {
-    console.log("database connected");
-  })
-  .catch(() => {
+  .catch((err) => {
+    console.log(err);
     console.log("database not connected");
   })
+
 
 
 const PORT = process.env.PORT || 6011;
