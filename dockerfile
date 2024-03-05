@@ -21,7 +21,7 @@ RUN npm install && npm install pm2 -g
 COPY . .
 
 # Expose the port your app runs on
-EXPOSE 4000
+EXPOSE 3000
 
 # Define the command to run your app
 CMD ["pm2-runtime", "start", "index.js"]
