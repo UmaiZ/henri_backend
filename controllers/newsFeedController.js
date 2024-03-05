@@ -6,6 +6,7 @@ const likeNewsFeedModel = require("../model/likeNewsFeedModel");
 const newsFeedModel = require("../model/newsFeedModel");
 const ratingNewsFeedModel = require("../model/ratingnewsfeedModel");
 const shareNewsFeedModel = require("../model/shareNewsFeedModel");
+const NotificationService = require("../services/notification")
 const { uploadFileWithFolder } = require("../utils/awsFileUploads");
 require("dotenv/config");
 const { loggerInfo, loggerError } = require('../utils/log');
@@ -393,6 +394,10 @@ const likePost = async (req, res) => {
       likedBy: user_id,
     }).lean();
 
+
+
+
+
     if (isLiked) {
       return res.status(400).json({
         success: false,
@@ -475,6 +480,8 @@ const commentNewsFeed = async (req, res) => {
         message: "News Feed Not Found",
       });
     }
+    await new NotificationService().sendPostNotification(newsFeedId, user_id, pushCommentNewsFeed.createdBy, 'comment');
+
 
     res.status(200).json({
       success: true,
