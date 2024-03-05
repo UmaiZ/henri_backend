@@ -6,7 +6,7 @@ COPY package*.json ./
 # Install app dependencies
 
 
-ENV COLLECTION=mongodb+srv://umaiz:ZkCgeXWjp9ZZjjC7@cluster0.pmpvie3.mongodb.net/HENRI
+ENV COLLECTION = mongodb+srv://umaiz:ZkCgeXWjp9ZZjjC7@cluster0.pmpvie3.mongodb.net/HENRI
 ENV TOKEN_KEY = sdadsdasdasdaeert
 ENV DB_NAME = henri
 ENV PORT = 3000

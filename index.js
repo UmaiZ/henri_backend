@@ -19,7 +19,7 @@ const newsFeedRouter = require("./routes/newsFeedRouter");
 const userRouter = require("./routes/user");
 const statusRouter = require("./routes/statusRouter");
 const chatRoomRouter = require("./routes/chatRouter");
-const channelRouter =require("./routes/channelRouter");
+const channelRouter = require("./routes/channelRouter");
 // const responseHandler = require("./utils/ResponseHandler/responseHandler");
 
 app.use(chatRoomRouter);
@@ -59,6 +59,8 @@ io.on("connection", (socket) => {
   // });
 });
 
+console.log(process.env.COLLECTION);
+console.log(process.env.DB_NAME);
 
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.COLLECTION, {
