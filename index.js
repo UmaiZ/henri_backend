@@ -59,14 +59,11 @@ io.on("connection", (socket) => {
   // });
 });
 
-console.log(process.env.COLLECTION);
-console.log(process.env.DB_NAME);
 
 mongoose.set("strictQuery", false);
-mongoose.connect(process.env.COLLECTION, {
+mongoose.connect("mongodb+srv://umaiz:ZkCgeXWjp9ZZjjC7@cluster0.pmpvie3.mongodb.net/HENRI", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-
 }).then(() => {
   console.log("database connected");
 })
