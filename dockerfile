@@ -11,8 +11,6 @@ ENV TOKEN_KEY = sdadsdasdasdaeert
 ENV DB_NAME = henri
 ENV PORT = 5000
 
-ENV APP_ID=02c388c395a1446dbdb4cf8f2ffc5b8d
-ENV APP_CERTIFICATE=cdf2eb23e3e3440e97a0bb075f578ea2
 
 RUN npm install && npm install pm2 -g
 
