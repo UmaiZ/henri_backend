@@ -74,11 +74,38 @@ mongoose.connect("mongodb+srv://umaiz:ZkCgeXWjp9ZZjjC7@cluster0.pmpvie3.mongodb.
 
 
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, (err) => {
-  console.log(`App listening on port ${PORT}!`);
+server.listen(5000, (err) => {
+  console.log(`App listening on port ${5000}!`);
   if (err) console.log(err);
 });
 // app.listen(PORT, () => { console.log(`App listening on port ${PORT}!`); });
 
 module.exports = server;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
