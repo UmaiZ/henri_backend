@@ -266,3 +266,8 @@
 {"error":{},"level":"error","message":"An error occurred"}
 {"level":"error","message":"User authenticated failed"}
 {"error":{"_message":"users validation failed","errors":{"channelName":{"kind":"required","message":"Path `channelName` is required.","name":"ValidatorError","path":"channelName","properties":{"message":"Path `channelName` is required.","path":"channelName","type":"required"}}},"message":"users validation failed: channelName: Path `channelName` is required.","name":"ValidationError"},"level":"error","message":"An error occurred"}
+{"level":"error","message":"User authenticated failed"}
+{"error":{"code":13297,"index":0},"level":"error","message":"An error occurred"}
+{"error":{"code":13297,"index":0},"level":"error","message":"An error occurred"}
+{"error":{"code":13297,"index":0},"level":"error","message":"An error occurred"}
+{"error":{"code":13297,"index":0},"level":"error","message":"An error occurred"}

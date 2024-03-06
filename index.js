@@ -20,6 +20,8 @@ const userRouter = require("./routes/user");
 const statusRouter = require("./routes/statusRouter");
 const chatRoomRouter = require("./routes/chatRouter");
 const channelRouter = require("./routes/channelRouter");
+const notificationRouter = require("./routes/notification");
+
 // const responseHandler = require("./utils/ResponseHandler/responseHandler");
 
 app.use(chatRoomRouter);
@@ -27,6 +29,7 @@ app.use(newsFeedRouter);
 app.use(userRouter);
 app.use(statusRouter);
 app.use(channelRouter);
+app.use(notificationRouter);
 
 
 app.get("/", (req, res) => {
@@ -61,7 +64,7 @@ io.on("connection", (socket) => {
 
 
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb+srv://umaiz:ZkCgeXWjp9ZZjjC7@cluster0.pmpvie3.mongodb.net/HENRI", {
+mongoose.connect("mongodb+srv://umaiz:ZkCgeXWjp9ZZjjC7@cluster0.pmpvie3.mongodb.net/henri", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {

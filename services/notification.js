@@ -11,7 +11,7 @@ class NotificationService {
       const notification = new notificationModel({
         showto: showuserid,
         notificationType: type === "all" ? "RANDOM" : "POST",
-        notificationTitle: "",
+        notificationTitle: type === "comment" ? `${usercheck.userName} commented on your post` : type === "rating" ? `${usercheck.userName} rated on your post` : "",
         notificationSubtitle: "",
         postid: postid
       });

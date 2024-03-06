@@ -658,7 +658,9 @@ const ratingPost = async (req, res) => {
         {
           new: true,
         });
+      console.log(post);
 
+      await new NotificationService().sendPostNotification(newsFeedId, user_id, post.createdBy, 'rating');
 
       return res.status(200).json({
         success: true,
