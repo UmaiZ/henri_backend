@@ -100,6 +100,10 @@ const userschema = new mongoose.Schema({
             ref: "users",
         },
     ],
+    userVerified: {
+        type: Boolean,
+        default: false
+    },
     // channel:{
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: "channels",

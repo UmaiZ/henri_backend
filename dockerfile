@@ -5,6 +5,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 # Install app dependencies
 
+ENV MAIL_USERNAME=devops@theapptitude.com
+ENV MAIL_PASSWORD=xbhgldnjbiiqjwbn
 
 ENV COLLECTION = mongodb+srv://umaiz:abc123456@cluster0.yqttf.mongodb.net/Henri
 ENV TOKEN_KEY = sdadsdasdasdaeert

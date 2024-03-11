@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const channelModel = require("../model/channelModel");
 // var loggerError=require("../utils/log");
-
+const sendEmails = require("../utils/sendEmail.js");
 
 const uploadOptions = multer({
   storage: multer.memoryStorage(),
@@ -19,9 +19,43 @@ const uploadOptions = multer({
   },
 });
 
+const verifyUser = async (req, res) => {
+  console.log('hh');
+  try {
+    const { id } = req.params;
 
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found"
+      })
+    }
+    user.userVerified = true;
+    const fullName = user.userName;
+
+    const responseHtml = `<html><body><h1>User Verification Successful</h1><p> Thank you ,${fullName} For Verifying Your Account</p></body></html>`.trim();
+
+    // Remove HTML tags using a regular expression
+    const plainText = responseHtml.replace(/<[^>]*>/g, '');
+
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      data: plainText
+    });
+  } catch (error) {
+    loggerError.error("Internal server error", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 const registerUser = async (req, res) => {
+  console.log("hit");
   const usercheck = await userModel.find({
     userEmail: req.body.userEmail,
   })
@@ -59,12 +93,25 @@ const registerUser = async (req, res) => {
   try {
     const usersave = await user.save();
     loggerInfo.info('User register successfully', { userName: req.body.userName });
+
+    console.log("hit2");
+
+    const apiLink = `http://10.0.2.2:5000/verifyUser/${usersave.id}`;
+    // http://3.17.57.230:4000/api/v1/
+    sendEmails.sendEmails(
+      usersave.userEmail,
+      "Link Sent Successfully",
+      `<h5>Your link is <a href="${apiLink}">${apiLink}</a></h5>`
+    );
+
+
     res.status(200).json({
       success: true,
       data: usersave,
       message: "User saved successfully",
     });
   } catch (err) {
+    console.log(err);
     loggerError.error('An error occurred', { error: err });
 
     if (err.name === "ValidationError") {
@@ -95,7 +142,12 @@ const loginUser = async (req, res) => {
       return res.status(200).json({ message: "user not found", success: false });
 
     }
+    if (!user.userVerified) {
 
+      return res
+        .status(200)
+        .json({ message: "User needs to verified please check email", success: false });
+    }
     if (user.userSocialToken) {
       const token = jwt.sign({ user_id: user._id }, process.env.TOKEN_KEY, {
         expiresIn: "7d",
@@ -532,7 +584,7 @@ module.exports = {
   followOrUnfollow,
   getUserTeamMates,
   getUsersFans,
-  updateUserProfile,
+  updateUserProfile, verifyUser,
   updateUser: [uploadOptions.fields([{
     name: 'image', maxCount: 1
   }, {

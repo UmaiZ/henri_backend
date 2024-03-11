@@ -1,9 +1,26 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 require("dotenv").config();
-const { emailConfig } = require('../config/emailConfig');
+const { emailConfig } = require('../config/emailconfig');
 // create reusable transporter object using the default SMTP transport
-const transporter = nodemailer.createTransport(emailConfig);
+const transport = nodemailer.createTransport({
+  service: "gmail",
+  pool: true,
+  port: 465,
+  secure: true,
+  logger: true,
+  debug: true,
+  secureConnection: true,
+  host: "smtp.gmail.com",
+  auth: {
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD
+  },
+  tls: {
+    rejectUnAuthorized: true
+  }
+
+});
 
 // Converting Stream to Buffer
 const streamToBuffer = (stream) => {
@@ -23,7 +40,9 @@ const getFileContent = async (filePath) => {
 };
 
 // send mail with defined transport object
-const sendEmails = (to, subject, content, next) => {
+const sendEmails = async (to, subject, content, next) => {
+  console.log(" Sending email to:", to); // Log the recipient email address
+
   try {
     const message = {
       from: {
@@ -34,9 +53,14 @@ const sendEmails = (to, subject, content, next) => {
       subject: subject,
       html: content,
     };
-    transporter.sendMail(message, next);
-  } catch (error) {
+    console.log("Sending email message:", message); // Log the email message before sending
+    await transport.sendMail(message);
+  }
+  catch (error) {
     console.error(error);
+    if (typeof next === "function") {
+      next(error); // Call the callback function with the error
+    }
   }
 };
 
