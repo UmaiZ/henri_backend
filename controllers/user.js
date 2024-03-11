@@ -96,7 +96,7 @@ const registerUser = async (req, res) => {
 
     console.log("hit2");
 
-    const apiLink = `http://10.0.2.2:5000/verifyUser/${usersave.id}`;
+    const apiLink = `https://api.triplepsports.mobi/verifyUser/${usersave.id}`;
     // http://3.17.57.230:4000/api/v1/
     sendEmails.sendEmails(
       usersave.userEmail,
